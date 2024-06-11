@@ -20,7 +20,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-const TableBanner = () => {
+const CategoryTable = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -37,7 +37,7 @@ const TableBanner = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/");
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/");
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
             } else {
@@ -59,7 +59,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-subcategory-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -85,7 +85,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -132,15 +132,37 @@ const TableBanner = () => {
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
-                                    <Box>
-                                        <Typography variant="h6">{product.name}</Typography>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography
+                                                variant="h6"
+                                                sx={{
+                                                    fontWeight: "600",
+                                                }}
+                                            >
+                                                {product.name}
+                                            </Typography>
+                                            <Typography
+                                                color="textSecondary"
+                                                sx={{
+                                                    fontSize: "13px",
+                                                }}
+                                            >
+                                                {product.categoryName}
+                                            </Typography>
+                                        </Box>
                                     </Box>
                                 </TableCell>
                                 <TableCell>
                                     <img
                                         src={`http://127.0.0.1:8000/${product.image}`}
                                         alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -194,4 +216,4 @@ const TableBanner = () => {
     );
 };
 
-export default TableBanner;
+export default CategoryTable;

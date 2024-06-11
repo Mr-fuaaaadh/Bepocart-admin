@@ -16,6 +16,18 @@ const Menuitems = [
     href: "/dashboards/dashboard1",
   },
   {
+    title: "Category",
+    icon: ViewCarouselIcon,
+    href: "/category-table/",
+  },
+
+  {
+    title: "Sub Category",
+    icon: ViewCarouselIcon,
+    href: "/subcategory-table/",
+  },
+
+  {
     title: "Banner",
     icon: ViewCarouselIcon,
     href: "/banner-table/",

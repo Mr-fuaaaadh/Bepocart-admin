@@ -20,7 +20,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-const TableBanner = () => {
+const CategoryTable = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -37,9 +37,9 @@ const TableBanner = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/");
-            if (Array.isArray(response.data.data)) {
-                setProducts(response.data.data);
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/");
+            if (Array.isArray(response.data)) {
+                setProducts(response.data);
             } else {
                 console.error("Invalid data format:", response.data);
                 setError("Invalid data format");
@@ -59,7 +59,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -85,7 +85,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -140,7 +140,7 @@ const TableBanner = () => {
                                     <img
                                         src={`http://127.0.0.1:8000/${product.image}`}
                                         alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -194,4 +194,4 @@ const TableBanner = () => {
     );
 };
 
-export default TableBanner;
+export default CategoryTable;

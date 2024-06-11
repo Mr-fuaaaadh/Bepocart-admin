@@ -31,6 +31,11 @@ const OfferBannerTable = lazy(() => import("../views/OfferBanner/BannerTable.js"
 const ProductForm = lazy(() => import("../views/Product/Form.js"));
 const ProductTable = lazy(() => import("../views/Product/ProductTable.js"));
 
+const CategoryForm = lazy(() => import("../views/Category/Form.js"));
+const CategoryTable = lazy(() => import("../views/Category/CategoryTable.js"));
+
+const SubcategoryForm = lazy(() => import("../views/Subcategory/Form.js"));
+const SubcategoryTable = lazy(() => import("../views/Subcategory/SubcategoryTable.js"));
 
 /*****Routes******/
 
@@ -58,6 +63,12 @@ const ThemeRoutes = [
 
       { path: "/product-form/", element: <ProductForm /> },
       { path: "/product-table/", element: <ProductTable /> },
+
+      { path: "/category-form/", element: <CategoryForm /> },
+      { path: "/category-table/", element: <CategoryTable /> },
+
+      { path: "/subcategory-form/", element: <SubcategoryForm /> },
+      { path: "/subcategory-table/", element: <SubcategoryTable /> },
 
 
 
