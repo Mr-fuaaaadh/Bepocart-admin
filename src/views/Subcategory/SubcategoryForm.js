@@ -8,13 +8,12 @@ import {
     Typography,
     TextField,
     Button,
-    Grid,
-    Alert,
     Snackbar,
+    Alert,
+    FormControl,
+    InputLabel,
     Select,
     MenuItem,
-    InputLabel,
-    FormControl,
 } from "@mui/material";
 
 const FbDefaultForm = () => {
@@ -22,13 +21,14 @@ const FbDefaultForm = () => {
         name: "",
         file: null,
         mainCategory: "",
+        selectedCategoryImage: null,
     });
 
     const [mainCategories, setMainCategories] = useState([]);
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(true); // New state for loading indicator
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchMainCategories();
@@ -37,28 +37,40 @@ const FbDefaultForm = () => {
     const fetchMainCategories = async () => {
         try {
             const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/");
-            setMainCategories(response.data.data || []);
-            setLoading(false); // Set loading to false after data is fetched
-            console.log(response)
+            if (Array.isArray(response.data)) {
+                setMainCategories(response.data);
+            } else {
+                console.error("Invalid data format:", response.data);
+            }
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching main categories:", error);
-            setLoading(false); // Set loading to false even if fetch fails
+            setLoading(false);
         }
     };
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setState({
-            ...state,
-            [name]: files ? files[0] : value,
-        });
+        if (name === "category") {
+            const selectedCategory = mainCategories.find(category => category.id === value);
+            setState({
+                ...state,
+                mainCategory: value,
+                selectedCategoryImage: selectedCategory ? `http://127.0.0.1:8000/${selectedCategory.image}` : null,
+            });
+        } else {
+            setState({
+                ...state,
+                [name]: files ? files[0] : value,
+            });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
         formData.append("name", state.name);
-        formData.append("mainCategory", state.mainCategory);
+        formData.append("category", state.mainCategory);
         if (state.file) {
             formData.append("image", state.file);
         }
@@ -73,11 +85,11 @@ const FbDefaultForm = () => {
             setSeverity("success");
             setOpen(true);
             console.log("Success", response.data);
-            // Clear form state after success
             setState({
                 name: "",
                 file: null,
                 mainCategory: "",
+                selectedCategoryImage: null,
             });
         } catch (error) {
             setMessage("Failed to submit the form.");
@@ -109,7 +121,7 @@ const FbDefaultForm = () => {
                 </Box>
                 <Divider />
                 <CardContent sx={{ padding: "30px" }}>
-                    {loading ? ( // Show loading indicator while data is being fetched
+                    {loading ? (
                         <Typography>Loading...</Typography>
                     ) : (
                         <form onSubmit={handleSubmit}>
@@ -130,32 +142,37 @@ const FbDefaultForm = () => {
                                 sx={{ mb: 2 }}
                                 onChange={(e) => setState({ ...state, file: e.target.files[0] })}
                             />
-                            <TextField
-                                fullWidth
-                                id="standard-select-number"
-                                variant="outlined"
-                                select
-                                name = "category"
-                                label="Category"
-                                value={state.mainCategory}
-                                onChange={handleChange}
-                                sx={{
-                                    mb: 2,
-                                }}
-                            >
-                                {mainCategories.map((category) => (
-                                    <MenuItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                            <Grid container spacing={0} sx={{ mb: 2 }}>
-                            </Grid>
-                            <div>
-                                <Button type="submit" color="primary" variant="contained">
-                                    Submit
-                                </Button>
-                            </div>
+                            <FormControl fullWidth sx={{ mb: 2 }}>
+                                <InputLabel>Category</InputLabel>
+                                <Select
+                                    name="category"
+                                    value={state.mainCategory}
+                                    onChange={handleChange}
+                                >
+                                    {mainCategories.map((category) => (
+                                        <MenuItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {state.selectedCategoryImage && (
+                                <Box
+                                    component="img"
+                                    src={state.selectedCategoryImage}
+                                    alt="Selected Category"
+                                    sx={{
+                                        maxWidth: "100%",
+                                        maxHeight: "200px",
+                                        mb: 2,
+                                        borderRadius: "8px",
+                                        boxShadow: 1,
+                                    }}
+                                />
+                            )}
+                            <Button type="submit" color="primary" variant="contained">
+                                Submit
+                            </Button>
                         </form>
                     )}
                 </CardContent>

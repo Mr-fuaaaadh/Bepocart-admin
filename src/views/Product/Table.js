@@ -33,7 +33,7 @@ const TableBanner = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/");
+            const response = await axios.get("https://stylus-interracial-floppy-msn.trycloudflare.com/admin/Bepocart-products/");
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
             } else {
@@ -166,15 +166,15 @@ const TableBanner = () => {
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
                                             whiteSpace: "nowrap",
-                                            color: product.stock === 0 ? 'red' : 'green'  // Conditional styling based on stock value
+                                            color: product.stock === 0 ? 'red' : 'green'
                                         }}
                                     >
-                                        {product.stock === 0 ? 'Stock Out' : product.stock}
+                                        {product.stock === 0 ? 'Stock Out' : 'Stock In'}
                                     </Typography>
                                 </Box>
                             </TableCell>
                             <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}> {/* Adjust the width as needed */}
+                                <Box sx={{ maxWidth: "150px" }}>
                                     <Typography
                                         variant="h6"
                                         noWrap

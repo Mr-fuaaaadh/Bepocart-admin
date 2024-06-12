@@ -27,6 +27,7 @@ const CategoryTable = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [editedProductImage, setEditedProductImage] = useState(null); // Define editedProductImage state
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -85,10 +86,15 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
-            });
+            // Prepare form data
+            const formData = new FormData();
+            formData.append("name", editedProductName);
+            if (editedProductImage) {
+                formData.append("image", editedProductImage);
+            }
+            
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, formData);
+            
             // Update product locally
             const updatedProducts = products.map(product =>
                 product.id === editProductId ? { ...product, name: editedProductName } : product
@@ -167,12 +173,12 @@ const CategoryTable = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product.id)}>
-                                        <DeleteIcon/> Delete
+                                        <DeleteIcon /> Delete
                                     </Button>
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
-                                        <EditIcon/> Update
+                                        <EditIcon /> Update
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -193,25 +199,51 @@ const CategoryTable = () => {
                 </DialogActions>
             </Dialog>
 
-           
+
 
 
             {/* Edit Product Dialog */}
-            <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Product Name"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                        fullWidth
+<Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
+    <DialogTitle>Edit Product</DialogTitle>
+    <DialogContent>
+        <TextField
+            label="Product Name"
+            value={editedProductName}
+            onChange={(e) => setEditedProductName(e.target.value)}
+            fullWidth
+            variant="outlined"
+            margin="normal"
+        />
+        <Box mt={2}>
+            <Typography variant="subtitle1">Product Image:</Typography>
+            <Box mt={1}>
+                {editedProductImage && (
+                    <img
+                        src={URL.createObjectURL(editedProductImage)}
+                        alt="Product"
+                        style={{ maxWidth: "100%", borderRadius: "4px" }}
                     />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button onClick={handleSaveEdit} variant="contained" color="primary">Save</Button>
-                </DialogActions>
-            </Dialog>
+                )}
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setEditedProductImage(e.target.files[0])}
+                    style={{ marginTop: "8px" }}
+                />
+            </Box>
+        </Box>
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={handleEditDialogClose} color="primary">
+            Cancel
+        </Button>
+        <Button onClick={handleSaveEdit} variant="contained" color="primary">
+            Save
+        </Button>
+    </DialogActions>
+</Dialog>
+
+
         </>
     );
 };
