@@ -1,5 +1,5 @@
 import React from "react";
-//import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -113,21 +113,25 @@ const Header = (props) => {
             </Box>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose5}>
-            <Avatar
-              sx={{
-                width: "35px",
-                height: "35px",
-              }}
-            />
-            <Box
-              sx={{
-                ml: 2,
-              }}
-            >
-              New Page
-            </Box>
-          </MenuItem>
+          <Link to="size-table/" style={{ textDecoration: 'none', color: 'inherit' }}>
+
+            <MenuItem onClick={handleClose5}>
+              <Avatar
+                sx={{
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+              <Box
+                sx={{
+                  ml: 2,
+                }}
+              >
+                Product Size
+              </Box>
+            </MenuItem>
+          </Link>
+
           <MenuItem onClick={handleClose5}>
             <Avatar
               sx={{

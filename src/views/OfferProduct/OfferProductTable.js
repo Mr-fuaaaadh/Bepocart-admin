@@ -12,9 +12,10 @@ const ProductTable = () => {
           <Box
             sx={{
               overflowX: "auto",  // Allow horizontal scrolling
-              overflowY: "hidden", // Prevent vertical scrolling
+              overflowY: "auto",  // Enable vertical scrolling
               whiteSpace: "nowrap", // Prevent wrapping of table content
               maxWidth: "100%", // Ensure it fits within the container
+              maxHeight: "800px", // Set a fixed height for vertical scrolling
             }}
           >
             <ExTable />

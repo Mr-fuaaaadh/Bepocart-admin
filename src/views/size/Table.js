@@ -37,7 +37,7 @@ const CategoryTable = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-categories/");
+            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-product-size-view/");
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -121,7 +121,6 @@ const CategoryTable = () => {
                         <TableRow>
                             <TableCell>Id</TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell>Image</TableCell>
                             <TableCell>Delete</TableCell>
                             <TableCell>Update</TableCell>
                         </TableRow>
@@ -135,13 +134,6 @@ const CategoryTable = () => {
                                     <Box>
                                         <Typography variant="h6">{product.name}</Typography>
                                     </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <img
-                                        src={`https://sample-houston-cet-travel.trycloudflare.com/${product.image}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "50px", maxHeight: "50px" }}
-                                    />
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product.id)}>
@@ -163,7 +155,7 @@ const CategoryTable = () => {
             <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    <Typography variant="body1">Are you sure you want to delete this product?</Typography>
+                    <Typography variant="body1">Are you sure you want to delete this Size?</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCancelDelete}>Cancel</Button>

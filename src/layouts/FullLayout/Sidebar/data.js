@@ -8,6 +8,13 @@ import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AutoAwesomeMosaicOutlinedIcon from '@mui/icons-material/AutoAwesomeMosaicOutlined';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
+import CategoryIcon from '@mui/icons-material/Category';
+import ClassIcon from '@mui/icons-material/Class';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import AdUnitsIcon from '@mui/icons-material/AdUnits';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+
 
 const Menuitems = [
   {
@@ -17,13 +24,13 @@ const Menuitems = [
   },
   {
     title: "Category",
-    icon: ViewCarouselIcon,
+    icon: CategoryIcon,
     href: "/category-table/",
   },
 
   {
     title: "Sub Category",
-    icon: ViewCarouselIcon,
+    icon: ClassIcon,
     href: "/subcategory-table/",
   },
 
@@ -35,15 +42,28 @@ const Menuitems = [
 
   {
     title: "Offer Banner",
-    icon: ViewCarouselIcon,
+    icon: AdUnitsIcon,
     href: "/offer-banner-table/",
   },
 
   {
     title: "Product",
-    icon: ViewCarouselIcon,
+    icon: InventoryIcon,
     href: "/product-table/",
   },
+
+  {
+    title: "Offer Product",
+    icon: LocalOfferIcon,
+    href: "/offer-product-table/",
+  },
+
+  {
+    title: "Orders",
+    icon: ShoppingBasketIcon,
+    href: "/offer-product-table/",
+  },
+
 
   {
     title: "Autocomplete",

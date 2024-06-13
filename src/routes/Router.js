@@ -37,6 +37,16 @@ const CategoryTable = lazy(() => import("../views/Category/CategoryTable.js"));
 const SubcategoryForm = lazy(() => import("../views/Subcategory/Form.js"));
 const SubcategoryTable = lazy(() => import("../views/Subcategory/SubcategoryTable.js"));
 
+const SizeForm = lazy(() => import("../views/size/Form.js"));
+const SizeTable = lazy(() => import("../views/size/SizeTable.js"));
+
+const ProductImageForm = lazy(() => import("../views/ProductImages/Form.js"));
+const ProductImagesTable = lazy(() => import("../views/ProductImages/ProductImageTable.js"));
+
+const OfferProductForm = lazy(() => import("../views/OfferProduct/Form.js"));
+const OfferProductTable = lazy(() => import("../views/OfferProduct/OfferProductTable.js"));
+
+
 /*****Routes******/
 
 const ThemeRoutes = [
@@ -69,6 +79,17 @@ const ThemeRoutes = [
 
       { path: "/subcategory-form/", element: <SubcategoryForm /> },
       { path: "/subcategory-table/", element: <SubcategoryTable /> },
+
+      { path: "/size-table/", element: <SizeTable /> },
+      { path: "/size-form/", element: <SizeForm /> },
+
+      { path: "/product-image-table/:id", element: <ProductImagesTable /> },
+      { path: "/product-image-form/:id", element: <ProductImageForm /> },
+
+      { path: "/offer-product-table/", element: <OfferProductTable /> },
+      { path: "/offer-product-form/", element: <OfferProductForm /> },
+
+
 
 
 

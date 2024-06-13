@@ -1,29 +1,33 @@
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom"; // Import Link from react-router-dom
+
 import { Card, CardContent, Box, Typography, Button } from "@mui/material";
+
 import ExTable from "./Table.js";
 
-const ProductTable = () => {
+const SizeTable = () => {
   return (
     <Box position="relative">
       <Card variant="outlined">
         <CardContent>
-          <Typography variant="h3">Product Table</Typography>
+          <Typography variant="h3">Size Table</Typography>
+          {/* Add Banner Table Component */}
           <Box
             sx={{
-              overflowX: "auto",  // Allow horizontal scrolling
-              overflowY: "hidden", // Prevent vertical scrolling
-              whiteSpace: "nowrap", // Prevent wrapping of table content
-              maxWidth: "100%", // Ensure it fits within the container
+              overflow: {
+                xs: "auto",
+                sm: "unset",
+              },
             }}
           >
             <ExTable />
           </Box>
         </CardContent>
       </Card>
+      {/* Add Banner Button Positioned at Top-Left */}
       <Button
         component={RouterLink}
-        to="/product-form/"
+        to="/size-form/"
         variant="contained"
         color="success"
         sx={{
@@ -31,13 +35,13 @@ const ProductTable = () => {
           top: 0,
           left: 0,
           mt: 2,
-          ml: 125, // Adjusted for a more realistic margin
+          ml: 125,
         }}
       >
-        Add product
+        Add Size
       </Button>
     </Box>
   );
 };
 
-export default ProductTable;
+export default SizeTable;

@@ -36,9 +36,9 @@ const TableBanner = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-products/");
-            if (Array.isArray(response.data.data)) {
-                setProducts(response.data.data);
+            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-Offer-Products/");
+            if (Array.isArray(response.data)) {
+                setProducts(response.data);
             } else {
                 console.error("Invalid data format:", response.data);
             }
@@ -112,7 +112,7 @@ const TableBanner = () => {
                         <TableCell>Image</TableCell>
                         <TableCell>Price</TableCell>
                         <TableCell>Stock</TableCell>
-                        <TableCell>Category</TableCell>
+                        <TableCell>Offer Type</TableCell>
                         <TableCell>Delete</TableCell>
                         <TableCell>Update</TableCell>
                     </TableRow>
@@ -193,7 +193,7 @@ const TableBanner = () => {
                                             whiteSpace: "nowrap",
                                         }}
                                     >
-                                        {product.categoryName}
+                                        {product.offer_type}
                                     </Typography>
                                 </Box>
                             </TableCell>
