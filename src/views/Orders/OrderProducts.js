@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
-
-
+import { useParams } from "react-router-dom";
 import {
     Typography,
     Box,
@@ -17,10 +15,10 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    Chip,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import PermMediaIcon from '@mui/icons-material/PermMedia';
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
@@ -30,15 +28,20 @@ const TableBanner = () => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
+    const { id } = useParams(); // id is received as a string
 
-    const fetchProducts = async () => {
+    useEffect(() => {
+        // Convert id to a number
+        const productId = parseInt(id);
+
+        fetchProducts(productId); // Pass id to fetchProducts function
+    }, [id]);
+
+    const fetchProducts = async (productId) => {
         try {
-            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Offer-Products/");
-            if (Array.isArray(response.data)) {
-                setProducts(response.data);
+            const response = await axios.get(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Order-Item/${productId}/`);
+            if (Array.isArray(response.data.data)) {
+                setProducts(response.data.data);
             } else {
                 console.error("Invalid data format:", response.data);
             }
@@ -54,7 +57,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-product-delete/${deleteProductId}/`);
+            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -97,123 +100,66 @@ const TableBanner = () => {
 
     return (
         <>
-            <Table
-                aria-label="simple table"
-                sx={{
-                    mt: 3,
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {/* Table Header */}
+            <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
                         <TableCell>Id</TableCell>
                         <TableCell>Name</TableCell>
-                        <TableCell>Image</TableCell>
+                        <TableCell>Images</TableCell>
+                        <TableCell>Quantity</TableCell>
                         <TableCell>Price</TableCell>
-                        <TableCell>Stock</TableCell>
+                        <TableCell>Total</TableCell>
                         <TableCell>Offer Type</TableCell>
-                        <TableCell>Variation</TableCell>
+                        <TableCell>Size</TableCell>
                         <TableCell>Delete</TableCell>
                         <TableCell>Update</TableCell>
                     </TableRow>
                 </TableHead>
-                {/* Table Body */}
                 <TableBody>
                     {products.map((product) => (
                         <TableRow key={product.id}>
                             <TableCell>{product.id}</TableCell>
-
                             <TableCell>
                                 <Box sx={{ maxWidth: "150px" }}>
-                                    <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-
-                                        <Typography
-                                            variant="h6"
-                                            noWrap
-                                            sx={{
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                                whiteSpace: "nowrap",
-                                            }}
-                                        >
-                                            {product.name}
-                                        </Typography>
-                                    </Link>
-
-                                </Box>
-                            </TableCell>
-                            <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
-                                </TableCell>
-                            </Link>
-                            <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                    >
-                                        {product.salePrice}
+                                    <Typography variant="h6" noWrap>
+                                        {product.productName}
                                     </Typography>
                                 </Box>
                             </TableCell>
                             <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                            color: product.stock === 0 ? 'red' : 'green'
-                                        }}
-                                    >
-                                        {product.stock === 0 ? 'Stock Out' : 'Stock In'}
-                                    </Typography>
-                                </Box>
+
+                                <img
+                                    src={`http://127.0.0.1:8000/${product.productImage}`}
+                                    alt={product.name}
+                                    style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                />
+
                             </TableCell>
+
+
+                            <TableCell>{product.quantity}</TableCell>
+
+                            <TableCell>{product.salePrice}</TableCell>
+
+                            <TableCell>{product.price}</TableCell>
+
                             <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                    >
-                                        {product.offer_type}
-                                    </Typography>
-                                </Box>
+                                <Chip
+                                    sx={{
+                                        backgroundColor: product.offer_type ? 'warning.main' : 'inherit',
+                                        pl: '4px',
+                                        pr: '4px',
+                                    }}
+                                    size="small"
+                                    label={product.offer_type || 'No offer'}
+                                />
                             </TableCell>
+
 
                             <TableCell>
                                 <Button
-                                    component={Link}
-                                    to={`/product-image-table/${product.id}/`}
                                     variant="contained"
-                                    color="primary"
-                                    startIcon={<PermMediaIcon />}
-                                >
-                                    Variant
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    color="error" // Use "error" for the red button color in Material-UI
+                                    color="error"
                                     onClick={() => handleDeleteConfirmation(product.id)}
                                     startIcon={<DeleteIcon />}
                                 >
@@ -232,7 +178,7 @@ const TableBanner = () => {
                         </TableRow>
                     ))}
                 </TableBody>
-            </Table >
+            </Table>
 
             {/* Delete Confirmation Dialog */}
             < Dialog open={deleteDialogOpen} onClose={handleCancelDelete} >

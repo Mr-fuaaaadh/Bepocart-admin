@@ -36,9 +36,13 @@ const TableBanner = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-products/");
+            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-products/");
+            console.log("Full response:", response); // Log the entire response
+    
+            // Assuming the correct array path is response.data.data
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
+                console.log("Response data:", response.data.data);
             } else {
                 console.error("Invalid data format:", response.data);
             }
@@ -46,6 +50,8 @@ const TableBanner = () => {
             console.error("Error fetching products:", error);
         }
     };
+    
+    
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -54,7 +60,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-product-delete/${deleteProductId}/`);
+            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-product-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -80,7 +86,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -113,6 +119,7 @@ const TableBanner = () => {
                         <TableCell>Price</TableCell>
                         <TableCell>Stock</TableCell>
                         <TableCell>Category</TableCell>
+                        <TableCell>Veriation</TableCell>
                         <TableCell>Delete</TableCell>
                         <TableCell>Update</TableCell>
                     </TableRow>

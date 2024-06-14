@@ -38,7 +38,7 @@ const TableBanner = () => {
 
     const fetchProducts = async (productId) => {
         try {
-            const response = await axios.get(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-Product-images/${productId}/`);
+            const response = await axios.get(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Product-images/${productId}/`);
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -56,7 +56,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
+            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -82,7 +82,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });

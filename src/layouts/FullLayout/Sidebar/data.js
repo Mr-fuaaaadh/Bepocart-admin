@@ -14,6 +14,7 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AdUnitsIcon from '@mui/icons-material/AdUnits';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import MilitaryTechSharpIcon from '@mui/icons-material/MilitaryTechSharp';
 
 
 const Menuitems = [
@@ -61,7 +62,13 @@ const Menuitems = [
   {
     title: "Orders",
     icon: ShoppingBasketIcon,
-    href: "/offer-product-table/",
+    href: "/order-table/",
+  },
+
+  {
+    title: "Promotion coupen",
+    icon: MilitaryTechSharpIcon,
+    href: "/coupen-table/",
   },
 
 

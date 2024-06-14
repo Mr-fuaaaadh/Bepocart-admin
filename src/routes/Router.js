@@ -46,6 +46,14 @@ const ProductImagesTable = lazy(() => import("../views/ProductImages/ProductImag
 const OfferProductForm = lazy(() => import("../views/OfferProduct/Form.js"));
 const OfferProductTable = lazy(() => import("../views/OfferProduct/OfferProductTable.js"));
 
+const OrderTable = lazy(() => import("../views/Orders/OrderTable.js"));
+const OrderProductsTable = lazy(() => import("../views/Orders/OrderProductTable.js"));
+
+const CoupenTable = lazy(() => import("../views/Coupens/CoupenTable.js"));
+
+
+
+
 
 /*****Routes******/
 
@@ -88,6 +96,14 @@ const ThemeRoutes = [
 
       { path: "/offer-product-table/", element: <OfferProductTable /> },
       { path: "/offer-product-form/", element: <OfferProductForm /> },
+
+      { path: "/order-table/", element: <OrderTable /> },
+      { path: "/order-product-table/:id", element: <OrderProductsTable /> },
+
+      { path: "/coupen-table/", element: <CoupenTable /> },
+
+
+
 
 
 

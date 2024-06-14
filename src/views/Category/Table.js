@@ -37,7 +37,7 @@ const CategoryTable = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-categories/");
+            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-categories/");
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -59,7 +59,7 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-category-delete/${deleteProductId}/`);
+            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-category-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -85,7 +85,7 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-category-update/${editProductId}/`, {
+            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-category-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -138,7 +138,7 @@ const CategoryTable = () => {
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={`https://sample-houston-cet-travel.trycloudflare.com/${product.image}`}
+                                        src={`https://flex-hiring-trailers-spy.trycloudflare.com/${product.image}`}
                                         alt={product.name}
                                         style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />
