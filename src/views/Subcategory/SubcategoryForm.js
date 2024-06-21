@@ -35,19 +35,27 @@ const FbDefaultForm = () => {
     }, []);
 
     const fetchMainCategories = async () => {
+        setLoading(true);
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/");
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-main-categories/", {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
             if (Array.isArray(response.data)) {
                 setMainCategories(response.data);
             } else {
                 console.error("Invalid data format:", response.data);
             }
-            setLoading(false);
         } catch (error) {
             console.error("Error fetching main categories:", error);
+        } finally {
             setLoading(false);
         }
     };
+    
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;

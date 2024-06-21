@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { useNavigate } from 'react-router-dom';
 import {
     Typography,
     Box,
@@ -29,6 +29,7 @@ const CategoryTable = () => {
     const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchProducts();
@@ -37,7 +38,14 @@ const CategoryTable = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-categories/");
+            const token = localStorage.getItem('token');
+            console.log("token", token);
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/", {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -46,7 +54,12 @@ const CategoryTable = () => {
             }
         } catch (error) {
             console.error("Error fetching products:", error);
-            setError("Error fetching products");
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                // Redirect to login page
+                navigate('/login');
+            } else {
+                setError("Error fetching products");
+            }
         } finally {
             setLoading(false);
         }
@@ -59,13 +72,25 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-category-delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error("User is not authenticated");
+                return;
+            }
+    
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
             console.error("Error deleting product:", error);
         }
     };
+    
 
     const handleCancelDelete = () => {
         setDeleteProductId(null);
@@ -85,7 +110,7 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-category-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -138,19 +163,19 @@ const CategoryTable = () => {
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={`https://flex-hiring-trailers-spy.trycloudflare.com/${product.image}`}
+                                        src={`http://127.0.0.1:8000/${product.image}`}
                                         alt={product.name}
                                         style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product.id)}>
-                                        <DeleteIcon/> Delete
+                                        <DeleteIcon/> 
                                     </Button>
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
-                                        <EditIcon/> Update
+                                        <EditIcon/> 
                                     </Button>
                                 </TableCell>
                             </TableRow>

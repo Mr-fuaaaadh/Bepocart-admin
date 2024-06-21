@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 
 import {
@@ -17,6 +17,7 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,6 +30,10 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         fetchProducts();
@@ -36,8 +41,13 @@ const TableBanner = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-products/");
-            console.log("Full response:", response); // Log the entire response
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/",{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+            console.log("Full response:", response); 
     
             // Assuming the correct array path is response.data.data
             if (Array.isArray(response.data.data)) {
@@ -48,6 +58,13 @@ const TableBanner = () => {
             }
         } catch (error) {
             console.error("Error fetching products:", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching banners");
+            }
+        } finally {
+            setLoading(false);
         }
     };
     
@@ -60,7 +77,12 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-product-delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`,{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -86,7 +108,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });
@@ -103,13 +125,20 @@ const TableBanner = () => {
 
     return (
         <>
-            <Table
-                aria-label="simple table"
-                sx={{
-                    mt: 3,
-                    whiteSpace: "nowrap",
-                }}
-            >
+             {loading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? (
+                <Typography variant="body1" color="error">{error}</Typography>
+            ) : (
+                <Table
+                    aria-label="simple table"
+                    sx={{
+                        mt: 3,
+                        whiteSpace: "nowrap",
+                    }}
+                >
                 {/* Table Header */}
                 <TableHead>
                     <TableRow>
@@ -239,6 +268,7 @@ const TableBanner = () => {
                     ))}
                 </TableBody>
             </Table >
+            )}
 
             {/* Delete Confirmation Dialog */}
             < Dialog open={deleteDialogOpen} onClose={handleCancelDelete} >

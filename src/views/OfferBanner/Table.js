@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 import {
     Typography,
@@ -13,6 +14,7 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
+    CircularProgress,
     DialogActions,
     TextField,
 } from "@mui/material";
@@ -26,21 +28,46 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         fetchProducts();
     }, []);
 
     const fetchProducts = async () => {
+        setLoading(true);
+        setError(null); 
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/");
+            const token = localStorage.getItem('token');
+            console.log("Token:", token); 
+
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/", {
+                headers: {
+                    'Authorization': `${token}`, 
+                },
+            });
+
+            console.log("Response:", response);
+
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
+                console.log("Products:", response.data.data); 
             } else {
                 console.error("Invalid data format:", response.data);
+                setError("Invalid data format received");
             }
         } catch (error) {
             console.error("Error fetching products:", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching banners");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -51,11 +78,17 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Offer-Banner-Delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Offer-Banner-Delete/${deleteProductId}/`, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
             console.error("Error deleting product:", error);
+            setError("Error deleting product");
         }
     };
 
@@ -77,11 +110,14 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
+            const token = localStorage.getItem('token');
             await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
                 name: editedProductName,
-                // Add other fields you want to update
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Add Bearer before token
+                },
             });
-            // Update product locally
             const updatedProducts = products.map(product =>
                 product.id === editProductId ? { ...product, name: editedProductName } : product
             );
@@ -89,61 +125,67 @@ const TableBanner = () => {
             setEditDialogOpen(false);
         } catch (error) {
             console.error("Error updating product:", error);
+            setError("Error updating product");
         }
     };
 
     return (
         <>
-            <Table
-                aria-label="simple table"
-                sx={{
-                    mt: 3,
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {/* Table Header */}
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Image</TableCell>
-                        <TableCell>Delete</TableCell>
-                        <TableCell>Update</TableCell>
-                    </TableRow>
-                </TableHead>
-                {/* Table Body */}
-                <TableBody>
-                    {products.map((product) => (
-                        <TableRow key={product.id}>
-                            <TableCell>{product.id}</TableCell>
-                            <TableCell>
-                                <Box>
-                                    <Typography variant="h6">{product.name}</Typography>
-                                </Box>
-                            </TableCell>
-                            <TableCell>
-                                <img
-                                    src={`http://127.0.0.1:8000/${product.image}`}
-                                    alt={product.name}
-                                    style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <Button variant="contained" color="danger" onClick={() => handleDeleteConfirmation(product.id)}>
-                                    <DeleteIcon/> Delete
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
-                                    <EditIcon/> Update
-                                </Button>
-                            </TableCell>
+            {loading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? (
+                <Typography variant="body1" color="error">{error}</Typography>
+            ) : (
+                <Table
+                    aria-label="simple table"
+                    sx={{
+                        mt: 3,
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Image</TableCell>
+                            <TableCell>Delete</TableCell>
+                            <TableCell>Update</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHead>
+                    <TableBody>
+                        {products.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell>{product.id}</TableCell>
+                                <TableCell>
+                                    <Box>
+                                        <Typography variant="h6">{product.name}</Typography>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <img
+                                        src={`http://127.0.0.1:8000/${product.image}`}
+                                        alt={product.name}
+                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product.id)}>
+                                        <DeleteIcon /> Delete
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
+                                        <EditIcon /> Update
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
 
-            {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
@@ -155,7 +197,6 @@ const TableBanner = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Product Dialog */}
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
                 <DialogTitle>Edit Product</DialogTitle>
                 <DialogContent>

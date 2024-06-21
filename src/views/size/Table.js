@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 import {
     Typography,
@@ -29,6 +30,8 @@ const CategoryTable = () => {
     const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         fetchProducts();
@@ -37,7 +40,13 @@ const CategoryTable = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-product-size-view/");
+            const token = localStorage.getItem('token')
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-product-size-view/",{
+                headers: {
+                    'Authorization': `${token}`
+                },
+            });
+
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -46,7 +55,11 @@ const CategoryTable = () => {
             }
         } catch (error) {
             console.error("Error fetching products:", error);
-            setError("Error fetching products");
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching banners");
+            }
         } finally {
             setLoading(false);
         }
@@ -59,7 +72,7 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-category-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -85,7 +98,7 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-category-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });

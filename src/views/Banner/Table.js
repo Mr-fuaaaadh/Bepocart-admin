@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { useNavigate } from 'react-router-dom';
 import {
     Typography,
     Box,
@@ -29,6 +29,7 @@ const TableBanner = () => {
     const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchProducts();
@@ -37,7 +38,13 @@ const TableBanner = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/");
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/", {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+            console.log("Success", response.data);
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
             } else {
@@ -46,11 +53,17 @@ const TableBanner = () => {
             }
         } catch (error) {
             console.error("Error fetching products:", error);
-            setError("Error fetching products");
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching banners");
+            }
         } finally {
             setLoading(false);
         }
     };
+    
+    
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -59,13 +72,22 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            const response = await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${deleteProductId}/`, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+            
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
+            console.log("Product deleted successfully:", response.data);
         } catch (error) {
             console.error("Error deleting product:", error);
+
         }
     };
+    
 
     const handleCancelDelete = () => {
         setDeleteProductId(null);

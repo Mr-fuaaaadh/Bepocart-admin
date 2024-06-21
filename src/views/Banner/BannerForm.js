@@ -40,28 +40,42 @@ const FbDefaultForm = () => {
         }
     
         try {
+            const token = localStorage.getItem('token');
             const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Banner/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `${token}`,
                 },
             });
+            console.log("Success", response.data);
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
-            console.log("Success", response.data);
-            // Clear form state after success
             setState({
                 name: "",
                 file: null,
             });
         } catch (error) {
+            if (error.response) {
+                if (error.response.status === 401) {
+                    window.location.href = '/login/';
+                    console.error("Unauthorized - Redirect to login page or handle accordingly.");
+                } else {
+                    console.error("Error Response:", error.response.data);
+                }
+            } else if (error.request) {
+                console.error("Request Error:", error.request);
+            } else {
+                console.error("General Error:", error.message);
+            }
             setMessage("Failed to submit the form.");
             setSeverity("error");
             setOpen(true);
-            console.error("Error", error.response ? error.response.data : error.message);
         }
     };
     
+    
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -103,7 +117,6 @@ const FbDefaultForm = () => {
                             onChange={(e) => setState({ ...state, file: e.target.files[0] })}
                         />
                         
-
                         <Grid container spacing={0} sx={{ mb: 2 }}>
                         </Grid>
                         <div>

@@ -38,16 +38,23 @@ const CategoryTable = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/");
+            const token = localStorage.getItem('token');
+            console.log("token",      token)
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/",{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
+                console.log("Response data:", response.data.data);
             } else {
                 console.error("Invalid data format:", response.data);
                 setError("Invalid data format");
             }
         } catch (error) {
             console.error("Error fetching products:", error);
-            setError("Error fetching products");
+            setError("Error fetching sub categories");
         } finally {
             setLoading(false);
         }
@@ -60,7 +67,18 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-subcategory-delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+    
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-subcategory-delete/${deleteProductId}/`, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {

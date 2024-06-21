@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
+
 import {
     Typography,
     Box,
@@ -17,6 +18,9 @@ const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    
 
     useEffect(() => {
         fetchProducts();
@@ -25,7 +29,12 @@ const TableBanner = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-promotion-coupen-views/");
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-views/",{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -33,8 +42,12 @@ const TableBanner = () => {
                 console.error("Invalid data format:", response.data);
             }
         } catch (error) {
-            setError("Error fetching products");
             console.error("Error fetching products:", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching banners");
+            }
         } finally {
             setLoading(false);
         }

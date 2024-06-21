@@ -27,6 +27,9 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);  
+    
 
     const { id } = useParams(); // id is received as a string
 
@@ -39,14 +42,24 @@ const TableBanner = () => {
 
     const fetchProducts = async (productId) => {
         try {
-            const response = await axios.get(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Order-Item/${productId}/`);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`,{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+           
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
             } else {
                 console.error("Invalid data format:", response.data);
+                setError("Invalid data format received");
             }
         } catch (error) {
             console.error("Error fetching products:", error);
+            setError("Error fetching orders");
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -57,7 +70,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -83,7 +96,7 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`https://flex-hiring-trailers-spy.trycloudflare.com/admin/Bepocart-Banner-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });

@@ -25,9 +25,18 @@ const FbDefaultForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("https://sample-houston-cet-travel.trycloudflare.com/admin/Bepocart-product-size/", {
-                name: name,
-            });
+            const token = localStorage.getItem('token');
+            const response = await axios.post(
+                "http://127.0.0.1:8000/admin/Bepocart-product-size/",
+                {
+                    name: name,
+                },
+                {
+                    headers: {
+                        'Authorization': `${token}`,
+                    }
+                }
+            );
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
@@ -41,7 +50,7 @@ const FbDefaultForm = () => {
             console.error("Error", error.response ? error.response.data : error.message);
         }
     };
-
+    
     const handleClose = () => {
         setOpen(false);
     };
