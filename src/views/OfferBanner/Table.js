@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-
 import {
     Typography,
     Box,
@@ -28,10 +27,11 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [editedProductImage, setEditedProductImage] = useState(null);
+    const [editedProductImagePreview, setEditedProductImagePreview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
 
     useEffect(() => {
         fetchProducts();
@@ -39,28 +39,21 @@ const TableBanner = () => {
 
     const fetchProducts = async () => {
         setLoading(true);
-        setError(null); 
+        setError(null);
         try {
             const token = localStorage.getItem('token');
-            console.log("Token:", token); 
-
             const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/", {
                 headers: {
-                    'Authorization': `${token}`, 
+                    'Authorization': `${token}`,
                 },
             });
 
-            console.log("Response:", response);
-
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
-                console.log("Products:", response.data.data); 
             } else {
-                console.error("Invalid data format:", response.data);
                 setError("Invalid data format received");
             }
         } catch (error) {
-            console.error("Error fetching products:", error);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                 navigate('/login');
             } else {
@@ -87,7 +80,6 @@ const TableBanner = () => {
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
-            console.error("Error deleting product:", error);
             setError("Error deleting product");
         }
     };
@@ -97,9 +89,11 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
+    const handleUpdate = (id, name, image) => {
         setEditProductId(id);
         setEditedProductName(name);
+        setEditedProductImage(null);
+        setEditedProductImagePreview(`http://127.0.0.1:8000/${image}`);
         setEditDialogOpen(true);
     };
 
@@ -111,20 +105,26 @@ const TableBanner = () => {
     const handleSaveEdit = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-            }, {
+            const formData = new FormData();
+            formData.append("name", editedProductName);
+            if (editedProductImage) {
+                formData.append("image", editedProductImage);
+            }
+
+            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Add Bearer before token
+                    'Authorization': `${token}`,
+                    'Content-Type': 'multipart/form-data',
                 },
             });
+
+            const updatedProduct = response.data;
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
+                product.id === editProductId ? updatedProduct : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
         } catch (error) {
-            console.error("Error updating product:", error);
             setError("Error updating product");
         }
     };
@@ -176,7 +176,7 @@ const TableBanner = () => {
                                     </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name, product.image)}>
                                         <EditIcon /> Update
                                     </Button>
                                 </TableCell>
@@ -205,7 +205,33 @@ const TableBanner = () => {
                         value={editedProductName}
                         onChange={(e) => setEditedProductName(e.target.value)}
                         fullWidth
+                        margin="normal"
                     />
+                    <Button
+                        variant="contained"
+                        component="label"
+                        sx={{ mt: 2 }}
+                    >
+                        Upload Image
+                        <input
+                            type="file"
+                            hidden
+                            onChange={(e) => {
+                                setEditedProductImage(e.target.files[0]);
+                                setEditedProductImagePreview(URL.createObjectURL(e.target.files[0]));
+                            }}
+                        />
+                    </Button>
+                    {editedProductImagePreview && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="body2">Selected Image:</Typography>
+                            <img
+                                src={editedProductImagePreview}
+                                alt="Selected"
+                                style={{ maxWidth: "200px", maxHeight: "200px" }}
+                            />
+                        </Box>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditDialogClose}>Cancel</Button>

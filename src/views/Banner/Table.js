@@ -16,6 +16,7 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -27,6 +28,7 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [editedProductImage, setEditedProductImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -62,8 +64,6 @@ const TableBanner = () => {
             setLoading(false);
         }
     };
-    
-    
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -78,16 +78,14 @@ const TableBanner = () => {
                     'Authorization': `${token}`,
                 },
             });
-            
+
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
             console.log("Product deleted successfully:", response.data);
         } catch (error) {
             console.error("Error deleting product:", error);
-
         }
     };
-    
 
     const handleCancelDelete = () => {
         setDeleteProductId(null);
@@ -107,13 +105,23 @@ const TableBanner = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append("name", editedProductName);
+            if (editedProductImage) {
+                formData.append("image", editedProductImage);
+            }
+
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+
             // Update product locally
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
+                product.id === editProductId ? { ...product, name: editedProductName, image: editedProductImage ? URL.createObjectURL(editedProductImage) : product.image } : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
@@ -167,12 +175,12 @@ const TableBanner = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product.id)}>
-                                        <DeleteIcon/> Delete
+                                        <DeleteIcon /> Delete
                                     </Button>
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
-                                        <EditIcon/> Update
+                                        <EditIcon /> Update
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -193,11 +201,8 @@ const TableBanner = () => {
                 </DialogActions>
             </Dialog>
 
-           
-
-
             {/* Edit Product Dialog */}
-            <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
+            <Dialog open={editDialogOpen} onClose={handleEditDialogClose} maxWidth="sm" fullWidth>
                 <DialogTitle>Edit Product</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -205,7 +210,30 @@ const TableBanner = () => {
                         value={editedProductName}
                         onChange={(e) => setEditedProductName(e.target.value)}
                         fullWidth
+                        margin="normal"
                     />
+                    <Button
+                        variant="contained"
+                        component="label"
+                        sx={{ mt: 2 }}
+                    >
+                        Upload Image
+                        <input
+                            type="file"
+                            hidden
+                            onChange={(e) => setEditedProductImage(e.target.files[0])}
+                        />
+                    </Button>
+                    {editedProductImage && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="body2">Selected Image:</Typography>
+                            <img
+                                src={URL.createObjectURL(editedProductImage)}
+                                alt="Selected"
+                                style={{ maxWidth: "200px", maxHeight: "200px" }}
+                            />
+                        </Box>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditDialogClose}>Cancel</Button>

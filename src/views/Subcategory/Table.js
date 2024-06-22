@@ -16,6 +16,10 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -27,36 +31,53 @@ const CategoryTable = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
-    const [editedProductImage, setEditedProductImage] = useState(null); // Define editedProductImage state
+    const [editedProductImage, setEditedProductImage] = useState(null);
+    const [editedMainCategory, setEditedMainCategory] = useState("");
+    const [mainCategories, setMainCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchProducts();
+        fetchMainCategories();
     }, []);
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            console.log("token",      token)
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/",{
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
-                console.log("Response data:", response.data.data);
             } else {
-                console.error("Invalid data format:", response.data);
                 setError("Invalid data format");
             }
         } catch (error) {
-            console.error("Error fetching products:", error);
-            setError("Error fetching sub categories");
+            setError("Error fetching subcategories");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchMainCategories = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/", {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+            if (Array.isArray(response.data)) {
+                setMainCategories(response.data);
+            } else {
+                console.error("Invalid data format for main categories:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching main categories:", error);
         }
     };
 
@@ -72,13 +93,13 @@ const CategoryTable = () => {
                 console.error("No token found");
                 return;
             }
-    
+
             await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-subcategory-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
-    
+
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -91,9 +112,10 @@ const CategoryTable = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
+    const handleUpdate = (id, name, mainCategory) => {
         setEditProductId(id);
         setEditedProductName(name);
+        setEditedMainCategory(mainCategory);
         setEditDialogOpen(true);
     };
 
@@ -104,18 +126,22 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            // Prepare form data
             const formData = new FormData();
             formData.append("name", editedProductName);
             if (editedProductImage) {
                 formData.append("image", editedProductImage);
             }
-            
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, formData);
-            
-            // Update product locally
+            formData.append("mainCategory", editedMainCategory); // Include main category in form data
+
+            const token = localStorage.getItem('token');
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-subcategory-update/${editProductId}/`, formData, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
+                product.id === editProductId ? { ...product, name: editedProductName, image: editedProductImage ? URL.createObjectURL(editedProductImage) : product.image, mainCategory: editedMainCategory } : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
@@ -140,7 +166,6 @@ const CategoryTable = () => {
                         whiteSpace: "nowrap",
                     }}
                 >
-                    {/* Table Header */}
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
@@ -150,7 +175,6 @@ const CategoryTable = () => {
                             <TableCell>Update</TableCell>
                         </TableRow>
                     </TableHead>
-                    {/* Table Body */}
                     <TableBody>
                         {products.map((product) => (
                             <TableRow key={product.id}>
@@ -195,7 +219,7 @@ const CategoryTable = () => {
                                     </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name, product.mainCategory)}>
                                         <EditIcon /> Update
                                     </Button>
                                 </TableCell>
@@ -217,51 +241,60 @@ const CategoryTable = () => {
                 </DialogActions>
             </Dialog>
 
-
-
-
             {/* Edit Product Dialog */}
-<Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-    <DialogTitle>Edit Product</DialogTitle>
-    <DialogContent>
-        <TextField
-            label="Product Name"
-            value={editedProductName}
-            onChange={(e) => setEditedProductName(e.target.value)}
-            fullWidth
-            variant="outlined"
-            margin="normal"
-        />
-        <Box mt={2}>
-            <Typography variant="subtitle1">Product Image:</Typography>
-            <Box mt={1}>
-                {editedProductImage && (
-                    <img
-                        src={URL.createObjectURL(editedProductImage)}
-                        alt="Product"
-                        style={{ maxWidth: "100%", borderRadius: "4px" }}
+            <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
+                <DialogTitle>Edit Product</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Product Name"
+                        value={editedProductName}
+                        onChange={(e) => setEditedProductName(e.target.value)}
+                        fullWidth
+                        variant="outlined"
+                        margin="normal"
                     />
-                )}
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setEditedProductImage(e.target.files[0])}
-                    style={{ marginTop: "8px" }}
-                />
-            </Box>
-        </Box>
-    </DialogContent>
-    <DialogActions>
-        <Button onClick={handleEditDialogClose} color="primary">
-            Cancel
-        </Button>
-        <Button onClick={handleSaveEdit} variant="contained" color="primary">
-            Save
-        </Button>
-    </DialogActions>
-</Dialog>
-
-
+                    <FormControl fullWidth variant="outlined" margin="normal">
+                        <InputLabel>Main Category</InputLabel>
+                        <Select
+                            value={editedMainCategory}
+                            onChange={(e) => setEditedMainCategory(e.target.value)}
+                            label="Main Category"
+                        >
+                            {mainCategories.map((category) => (
+                                <MenuItem key={category.id} value={category.id}>
+                                    {category.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Box mt={2}>
+                        <Typography variant="subtitle1">Product Image:</Typography>
+                        <Box mt={1}>
+                            {editedProductImage && (
+                                <img
+                                    src={URL.createObjectURL(editedProductImage)}
+                                    alt="Product"
+                                    style={{ maxWidth: "100%", borderRadius: "4px" }}
+                                />
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setEditedProductImage(e.target.files[0])}
+                                style={{ marginTop: "8px" }}
+                            />
+                        </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleEditDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSaveEdit} variant="contained" color="primary">
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

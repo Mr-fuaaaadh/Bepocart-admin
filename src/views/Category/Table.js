@@ -27,6 +27,7 @@ const CategoryTable = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [editedProductImage, setEditedProductImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -55,7 +56,6 @@ const CategoryTable = () => {
         } catch (error) {
             console.error("Error fetching products:", error);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                // Redirect to login page
                 navigate('/login');
             } else {
                 setError("Error fetching products");
@@ -90,16 +90,16 @@ const CategoryTable = () => {
             console.error("Error deleting product:", error);
         }
     };
-    
 
     const handleCancelDelete = () => {
         setDeleteProductId(null);
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
+    const handleUpdate = (id, name, image) => {
         setEditProductId(id);
         setEditedProductName(name);
+        setEditedProductImage(null); // Reset the image input
         setEditDialogOpen(true);
     };
 
@@ -110,13 +110,22 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
+            const formData = new FormData();
+            formData.append('name', editedProductName);
+            if (editedProductImage) {
+                formData.append('image', editedProductImage);
+            }
+
+            const token = localStorage.getItem('token');
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, formData, {
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
             });
-            // Update product locally
+
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
+                product.id === editProductId ? { ...product, name: editedProductName, image: editedProductImage ? URL.createObjectURL(editedProductImage) : product.image } : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
@@ -141,7 +150,6 @@ const CategoryTable = () => {
                         whiteSpace: "nowrap",
                     }}
                 >
-                    {/* Table Header */}
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
@@ -151,7 +159,6 @@ const CategoryTable = () => {
                             <TableCell>Update</TableCell>
                         </TableRow>
                     </TableHead>
-                    {/* Table Body */}
                     <TableBody>
                         {products.map((product) => (
                             <TableRow key={product.id}>
@@ -174,7 +181,7 @@ const CategoryTable = () => {
                                     </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name, product.image)}>
                                         <EditIcon/> 
                                     </Button>
                                 </TableCell>
@@ -184,7 +191,6 @@ const CategoryTable = () => {
                 </Table>
             )}
 
-            {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
@@ -196,10 +202,6 @@ const CategoryTable = () => {
                 </DialogActions>
             </Dialog>
 
-           
-
-
-            {/* Edit Product Dialog */}
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
                 <DialogTitle>Edit Product</DialogTitle>
                 <DialogContent>
@@ -208,6 +210,12 @@ const CategoryTable = () => {
                         value={editedProductName}
                         onChange={(e) => setEditedProductName(e.target.value)}
                         fullWidth
+                    />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setEditedProductImage(e.target.files[0])}
+                        style={{ marginTop: '20px' }}
                     />
                 </DialogContent>
                 <DialogActions>

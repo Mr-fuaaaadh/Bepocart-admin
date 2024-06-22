@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams,useNavigate } from "react-router-dom";
-
+import { useParams, useNavigate } from "react-router-dom";
 import {
     Typography,
     Box,
@@ -15,22 +14,16 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [editProductId, setEditProductId] = useState(null);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
 
     const { id } = useParams(); // id is received as a string
 
@@ -43,11 +36,13 @@ const TableBanner = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            console.log("token   :",token)
             const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
+            console.log(response.data)
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -73,7 +68,12 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`,{
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -86,32 +86,8 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
-        setEditProductId(id);
-        setEditedProductName(name);
-        setEditDialogOpen(true);
-    };
 
-    const handleEditDialogClose = () => {
-        setEditProductId(null);
-        setEditDialogOpen(false);
-    };
 
-    const handleSaveEdit = async () => {
-        try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
-            });
-            const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
-            );
-            setProducts(updatedProducts);
-            setEditDialogOpen(false);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
 
     if (loading) {
         return <Typography>Loading...</Typography>;
@@ -138,7 +114,6 @@ const TableBanner = () => {
                             <TableCell>Image 5</TableCell>
                             <TableCell>Size</TableCell>
                             <TableCell>Delete</TableCell>
-                            <TableCell>Update</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -148,7 +123,7 @@ const TableBanner = () => {
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography variant="h6" noWrap>
-                                            {product.productName}
+                                            {product.color}
                                         </Typography>
                                     </Box>
                                 </TableCell>
@@ -198,15 +173,6 @@ const TableBanner = () => {
                                         Delete
                                     </Button>
                                 </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => handleUpdate(product.id, product.name)}
-                                        startIcon={<EditIcon />}
-                                    >
-                                        Update
-                                    </Button>
-                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -223,25 +189,6 @@ const TableBanner = () => {
                     <Button onClick={handleCancelDelete}>Cancel</Button>
                     <Button onClick={handleDelete} variant="contained" color="error">
                         Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Edit Product Dialog */}
-            <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Product Name"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button onClick={handleSaveEdit} variant="contained" color="primary">
-                        Save
                     </Button>
                 </DialogActions>
             </Dialog>
