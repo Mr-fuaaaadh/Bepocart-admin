@@ -154,7 +154,7 @@ const TableBanner = () => {
 
                             <TableCell>{product.salePrice}</TableCell>
 
-                            <TableCell>{product.price}</TableCell>
+                            <TableCell>{product.quantity * product.salePrice}</TableCell>
 
                             <TableCell>
                                 <Chip

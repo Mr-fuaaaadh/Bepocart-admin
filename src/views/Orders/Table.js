@@ -33,10 +33,11 @@ const TableBanner = () => {
                         'Authorization': `${token}`,
                     },
                 });
+                console.log("Orders   :",response.data.data)
                 if (Array.isArray(response.data.data)) {
                     setProducts(response.data.data);
                 } else {
-                    console.error("Invalid data format:", response.data);
+                    console.error("Invalid data format:", response.data.data);
                     setError("Invalid data format received");
                 }
             } catch (error) {
@@ -44,11 +45,12 @@ const TableBanner = () => {
                 if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                     navigate('/login');
                 } else {
-                    setError("Error fetching banners");
+                    setError("Error fetching orders");
                 }
             } finally {
                 setLoading(false);
             }
+            
         };
     
         fetchProducts(); // Call fetchProducts directly here
