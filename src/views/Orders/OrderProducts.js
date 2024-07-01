@@ -27,9 +27,12 @@ const TableBanner = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [discountPrice, setDiscountPrice] = useState(0);
+    const [couponCodeCharge, setCouponCodeCharge] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);  
-    
+    const [error, setError] = useState(null);
+
 
     const { id } = useParams(); // id is received as a string
 
@@ -43,12 +46,12 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`,{
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
-           
+
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
             } else {
@@ -59,7 +62,7 @@ const TableBanner = () => {
             console.error("Error fetching products:", error);
             setError("Error fetching orders");
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 
@@ -110,6 +113,33 @@ const TableBanner = () => {
             console.error("Error updating product:", error);
         }
     };
+    const calculateTotalAmount = () => {
+        let total = 0;
+        products.forEach(product => {
+            total += product.quantity * product.salePrice;
+        });
+        setTotalAmount(total);
+    };
+    
+    const calculateDiscountPrice = () => {
+        let discount = 0;
+        products.forEach(product => {
+            if (product.offer_type === 'discount') {
+                discount += product.quantity * product.salePrice;
+            }
+        });
+        setDiscountPrice(discount);
+    };
+    
+    const calculateCouponCodeCharge = () => {
+    };
+    useEffect(() => {
+        calculateTotalAmount();
+        calculateDiscountPrice();
+        calculateCouponCodeCharge();
+    }, [products]);
+    
+    
 
     return (
         <>
@@ -193,6 +223,13 @@ const TableBanner = () => {
                 </TableBody>
             </Table>
 
+            <Box mt={7}>
+                <Typography variant="subtitle1">Total Amount: ${totalAmount}</Typography>
+                <Typography variant="subtitle1">Discount Price: ${discountPrice}</Typography>
+                <Typography variant="subtitle1">Coupon Code Charge: ${couponCodeCharge}</Typography>
+            </Box>
+
+
             {/* Delete Confirmation Dialog */}
             < Dialog open={deleteDialogOpen} onClose={handleCancelDelete} >
                 <DialogTitle>Confirm Delete</DialogTitle>
@@ -221,7 +258,9 @@ const TableBanner = () => {
                     <Button onClick={handleSaveEdit} variant="contained" color="primary">Save</Button>
                 </DialogActions>
             </Dialog >
+
         </>
+
     );
 };
 

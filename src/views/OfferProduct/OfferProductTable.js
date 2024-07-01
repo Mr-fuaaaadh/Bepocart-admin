@@ -8,7 +8,7 @@ const ProductTable = () => {
     <Box position="relative">
       <Card variant="outlined">
         <CardContent>
-          <Typography variant="h3">Product Table</Typography>
+          <Typography variant="h3">Offer Product Table</Typography>
           <Box
             sx={{
               overflowX: "auto",  // Allow horizontal scrolling
@@ -24,7 +24,7 @@ const ProductTable = () => {
       </Card>
       <Button
         component={RouterLink}
-        to="/product-form/"
+        to="/offer-product-form/"
         variant="contained"
         color="success"
         sx={{
