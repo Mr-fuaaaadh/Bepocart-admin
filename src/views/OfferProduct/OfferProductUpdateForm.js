@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom"; // Assuming you're using React Router
+
 import {
     Card,
     CardContent,
@@ -18,6 +20,8 @@ import {
 } from "@mui/material";
 
 const FbDefaultForm = () => {
+    const { id } = useParams(); // Get id from URL params
+
     const [state, setState] = useState({
         name: "",
         file: null,
@@ -62,7 +66,6 @@ const FbDefaultForm = () => {
                 console.error("Error fetching offer banners", error);
             }
         };
-        fetchOfferBanners();
 
         const fetchCategories = async () => {
             try {
@@ -79,16 +82,62 @@ const FbDefaultForm = () => {
                 setOpen(true);
             }
         };
+
+        const fetchProductDetails = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Offer-Product-Update/${id}/`, {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
+
+                const productData = response.data.data; // Adjust this based on your API response structure
+
+                setState({
+                    name: productData.name,
+                    stock: productData.stock,
+                    category: productData.category,
+                    salePrice: productData.salePrice,
+                    price: productData.price,
+                    discount: productData.discount,
+                    description: productData.description,
+                    offerBanner: productData.offerBanner,
+                    shortDescription: productData.shortDescription,
+                    offerType: productData.offerType,
+                    offerStartDate: productData.offerStartDate,
+                    offerEndDate: productData.offerEndDate,
+                });
+            } catch (error) {
+                console.error("Error fetching product details", error);
+            }
+        };
+
+        fetchOfferBanners();
         fetchCategories();
-    }, []);
+        if (id) {
+            fetchProductDetails();
+        }
+    }, [id]); // Add id to dependency array
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setState({
-            ...state,
-            [name]: files ? files[0] : value,
-        });
+    
+        // Convert datetime-local input values to ISO format for backend compatibility
+        if (name === 'offerStartDate' || name === 'offerEndDate') {
+            const isoDateTime = new Date(value).toISOString();
+            setState({
+                ...state,
+                [name]: isoDateTime,
+            });
+        } else {
+            setState({
+                ...state,
+                [name]: files ? files[0] : value,
+            });
+        }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -111,12 +160,24 @@ const FbDefaultForm = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Offer-Product/", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `${token}`,
-                },
-            });
+            let response;
+            if (id) {
+                // Update existing product
+                response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Offer-Product-Update/${id}/`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `${token}`,
+                    },
+                });
+            } else {
+                // Create new product
+                response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Offer-Product/", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `${token}`,
+                    },
+                });
+            }
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
@@ -285,7 +346,7 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="offerStartDate"  // Corrected to lowercase 'offerStartDate'
+                                    name="offerStartDate"
                                     label="Offer Start Date"
                                     type="datetime-local"
                                     variant="outlined"
@@ -300,7 +361,7 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="offerEndDate"  // Corrected to lowercase 'offerEndDate'
+                                    name="offerEndDate"
                                     label="Offer End Date"
                                     type="datetime-local"
                                     variant="outlined"

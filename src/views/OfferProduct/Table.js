@@ -30,9 +30,6 @@ const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [editProductId, setEditProductId] = useState(null);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -77,6 +74,10 @@ const TableBanner = () => {
         setDeleteDialogOpen(true);
     };
 
+    const handleUpdateClick = (productId) => {
+        navigate(`/offer-product-update/${productId}/`);
+    };
+
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -99,33 +100,6 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
-        setEditProductId(id);
-        setEditedProductName(name);
-        setEditDialogOpen(true);
-    };
-
-    const handleEditDialogClose = () => {
-        setEditProductId(null);
-        setEditDialogOpen(false);
-    };
-
-    const handleSaveEdit = async () => {
-        try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
-            });
-            // Update product locally
-            const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
-            );
-            setProducts(updatedProducts);
-            setEditDialogOpen(false);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
 
     return (
         <>
@@ -217,7 +191,7 @@ const TableBanner = () => {
                                 <TableCell>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleUpdate(product.id, product.name)}
+                                        onClick={() => handleUpdateClick(product.id)} 
                                         startIcon={<EditIcon />}
                                     >
                                         Update
@@ -238,23 +212,6 @@ const TableBanner = () => {
                 <DialogActions>
                     <Button onClick={handleCancelDelete}>Cancel</Button>
                     <Button onClick={handleDelete} variant="contained" color="error">Confirm</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Edit Product Dialog */}
-            <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Product Name"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button onClick={handleSaveEdit} variant="contained" color="primary">Save</Button>
                 </DialogActions>
             </Dialog>
         </>

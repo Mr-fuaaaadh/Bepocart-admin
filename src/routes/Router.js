@@ -30,6 +30,8 @@ const OfferBannerTable = lazy(() =>
 
 const ProductForm = lazy(() => import("../views/Product/Form.js"));
 const ProductTable = lazy(() => import("../views/Product/ProductTable.js"));
+const ProductUpdateForm = lazy(() => import("../views/Product/UpdateForm.js"));
+
 
 const CategoryForm = lazy(() => import("../views/Category/Form.js"));
 const CategoryTable = lazy(() => import("../views/Category/CategoryTable.js"));
@@ -48,6 +50,8 @@ const ProductImagesTable = lazy(() =>
 );
 
 const OfferProductForm = lazy(() => import("../views/OfferProduct/Form.js"));
+const OfferProductUpdateForm = lazy(() => import("../views/OfferProduct/UpdateForm.js"));
+
 const OfferProductTable = lazy(() =>
   import("../views/OfferProduct/OfferProductTable.js")
 );
@@ -86,8 +90,11 @@ const ThemeRoutes = [
       { path: "banner-table/", element: <BannerTable /> },
       { path: "offer-banner-table/", element: <OfferBannerTable /> },
       { path: "offer-banner-form/", element: <OfferBannerForm /> },
+
       { path: "product-form/", element: <ProductForm /> },
+      { path: "product-update/:id/", element: <ProductUpdateForm /> },
       { path: "product-table/", element: <ProductTable /> },
+
       { path: "category-form/", element: <CategoryForm /> },
       { path: "category-table/", element: <CategoryTable /> },
       { path: "subcategory-form/", element: <SubcategoryForm /> },
@@ -96,8 +103,12 @@ const ThemeRoutes = [
       { path: "size-form/", element: <SizeForm /> },
       { path: "product-image-table/:id", element: <ProductImagesTable /> },
       { path: "product-image-form/:id", element: <ProductImageForm /> },
+
       { path: "offer-product-table/", element: <OfferProductTable /> },
       { path: "offer-product-form/", element: <OfferProductForm /> },
+      { path: "offer-product-update/:id/", element: <OfferProductUpdateForm /> },
+
+
       { path: "order-table/", element: <OrderTable /> },
       { path: "order-product-table/:id", element: <OrderProductsTable /> },
       { path: "coupen-table/", element: <CoupenTable /> },

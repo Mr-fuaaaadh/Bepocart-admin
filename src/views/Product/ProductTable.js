@@ -11,10 +11,10 @@ const ProductTable = () => {
           <Typography variant="h3">Product Table</Typography>
           <Box
             sx={{
-              overflowX: "auto",  // Allow horizontal scrolling
-              overflowY: "hidden", // Prevent vertical scrolling
-              whiteSpace: "nowrap", // Prevent wrapping of table content
-              maxWidth: "100%", // Ensure it fits within the container
+              overflowX: "auto",
+              overflowY: "hidden",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
             }}
           >
             <ExTable />
@@ -31,7 +31,7 @@ const ProductTable = () => {
           top: 0,
           left: 0,
           mt: 2,
-          ml: 125, // Adjusted for a more realistic margin
+          ml: 125,
         }}
       >
         Add product

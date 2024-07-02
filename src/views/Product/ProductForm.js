@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
     Card,
@@ -11,6 +11,7 @@ import {
     Grid,
     Alert,
     Snackbar,
+    MenuItem, // Import MenuItem for select options
 } from "@mui/material";
 
 const FbDefaultForm = () => {
@@ -18,7 +19,7 @@ const FbDefaultForm = () => {
         name: "",
         file: null,
         stock: "",
-        category: "",
+        category: "", // Category state
         price: "",
         description: "",
         shortDescription: "",
@@ -27,6 +28,25 @@ const FbDefaultForm = () => {
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
+    const [categories, setCategories] = useState([]); // State for storing categories
+
+    useEffect(() => {
+        fetchCategories(); // Fetch categories on component mount
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+            setCategories(response.data.data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -50,14 +70,17 @@ const FbDefaultForm = () => {
         formData.append("short_description", state.shortDescription);
 
         try {
-
-            const token = localStorage.getItem('token');
-            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `${token}`,
-                },
-            });
+            const token = localStorage.getItem("token");
+            const response = await axios.post(
+                "http://127.0.0.1:8000/admin/Bepocart-product/",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `${token}`,
+                    },
+                }
+            );
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
@@ -87,7 +110,7 @@ const FbDefaultForm = () => {
     return (
         <div>
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+                <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
                     {message}
                 </Alert>
             </Snackbar>
@@ -130,6 +153,7 @@ const FbDefaultForm = () => {
                             onChange={handleChange}
                         />
                         <TextField
+                            select
                             name="category"
                             label="Category"
                             variant="outlined"
@@ -137,9 +161,15 @@ const FbDefaultForm = () => {
                             sx={{ mb: 2 }}
                             value={state.category}
                             onChange={handleChange}
-                        />
+                        >
+                            {categories.map((category) => (
+                                <MenuItem key={category.id} value={category.id}>
+                                    {category.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                         <TextField
-                            name="salePrice"
+                            name="price"
                             label="Price"
                             variant="outlined"
                             fullWidth
@@ -170,9 +200,6 @@ const FbDefaultForm = () => {
                             onChange={handleChange}
                         />
 
-                        <Grid container spacing={2} sx={{ mb: 2 }}>
-                        </Grid>
-
                         <Button type="submit" color="primary" variant="contained">
                             Submit
                         </Button>
@@ -180,7 +207,7 @@ const FbDefaultForm = () => {
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 };
 
 export default FbDefaultForm;

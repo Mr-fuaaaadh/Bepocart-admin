@@ -154,8 +154,8 @@ const TableBanner = () => {
                         <TableCell>Total</TableCell>
                         <TableCell>Offer Type</TableCell>
                         <TableCell>Size</TableCell>
-                        <TableCell>Delete</TableCell>
-                        <TableCell>Update</TableCell>
+                        <TableCell>color</TableCell>
+                        {/* <TableCell>Update</TableCell> */}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -199,25 +199,10 @@ const TableBanner = () => {
                             </TableCell>
 
 
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={() => handleDeleteConfirmation(product.id)}
-                                    startIcon={<DeleteIcon />}
-                                >
-                                    Delete
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => handleUpdate(product.id, product.name)}
-                                    startIcon={<EditIcon />}
-                                >
-                                    Update
-                                </Button>
-                            </TableCell>
+                            <TableCell>{product.size}</TableCell>
+
+                            <TableCell>{product.color}</TableCell>
+
                         </TableRow>
                     ))}
                 </TableBody>

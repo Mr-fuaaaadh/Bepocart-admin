@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 import {
@@ -16,7 +16,6 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField,
     CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,9 +26,6 @@ const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [editProductId, setEditProductId] = useState(null);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [editedProductName, setEditedProductName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -42,13 +38,13 @@ const TableBanner = () => {
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/",{
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
-            console.log("Full response:", response); 
-    
+            console.log("Full response:", response);
+
             // Assuming the correct array path is response.data.data
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
@@ -67,18 +63,23 @@ const TableBanner = () => {
             setLoading(false);
         }
     };
-    
-    
+
+
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
         setDeleteDialogOpen(true);
     };
 
+    const handleUpdateClick = (productId) => {
+        navigate(`/product-update/${productId}/`);
+    };
+
+
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`,{
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -95,37 +96,10 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
-        setEditProductId(id);
-        setEditedProductName(name);
-        setEditDialogOpen(true);
-    };
-
-    const handleEditDialogClose = () => {
-        setEditProductId(null);
-        setEditDialogOpen(false);
-    };
-
-    const handleSaveEdit = async () => {
-        try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
-            });
-            // Update product locally
-            const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
-            );
-            setProducts(updatedProducts);
-            setEditDialogOpen(false);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
 
     return (
         <>
-             {loading ? (
+            {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
                     <CircularProgress />
                 </Box>
@@ -139,30 +113,56 @@ const TableBanner = () => {
                         whiteSpace: "nowrap",
                     }}
                 >
-                {/* Table Header */}
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Image</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell>Stock</TableCell>
-                        <TableCell>Category</TableCell>
-                        <TableCell>Veriation</TableCell>
-                        <TableCell>Delete</TableCell>
-                        <TableCell>Update</TableCell>
-                    </TableRow>
-                </TableHead>
-                {/* Table Body */}
-                <TableBody>
-                    {products.map((product) => (
-                        <TableRow key={product.id}>
-                            <TableCell>{product.id}</TableCell>
+                    {/* Table Header */}
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Image</TableCell>
+                            <TableCell>Price</TableCell>
+                            <TableCell>Stock</TableCell>
+                            <TableCell>Category</TableCell>
+                            <TableCell>Veriation</TableCell>
+                            <TableCell>Delete</TableCell>
+                            <TableCell>Update</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {/* Table Body */}
+                    <TableBody>
+                        {products.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell>{product.id}</TableCell>
 
-                            <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
 
+                                            <Typography
+                                                variant="h6"
+                                                noWrap
+                                                sx={{
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                {product.name}
+                                            </Typography>
+                                        </Link>
+
+                                    </Box>
+                                </TableCell>
+                                <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <TableCell>
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </TableCell>
+                                </Link>
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
                                         <Typography
                                             variant="h6"
                                             noWrap
@@ -172,102 +172,77 @@ const TableBanner = () => {
                                                 whiteSpace: "nowrap",
                                             }}
                                         >
-                                            {product.name}
+                                            {product.salePrice}
                                         </Typography>
-                                    </Link>
-
-                                </Box>
-                            </TableCell>
-                            <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    </Box>
                                 </TableCell>
-                            </Link>
-                            <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                    >
-                                        {product.salePrice}
-                                    </Typography>
-                                </Box>
-                            </TableCell>
-                            <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                            color: product.stock === 0 ? 'red' : 'green'
-                                        }}
-                                    >
-                                        {product.stock === 0 ? 'Stock Out' : 'Stock In'}
-                                    </Typography>
-                                </Box>
-                            </TableCell>
-                            <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                    >
-                                        {product.categoryName}
-                                    </Typography>
-                                </Box>
-                            </TableCell>
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Typography
+                                            variant="h6"
+                                            noWrap
+                                            sx={{
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                                color: product.stock === 0 ? 'red' : 'green'
+                                            }}
+                                        >
+                                            {product.stock === 0 ? 'Stock Out' : 'Stock In'}
+                                        </Typography>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Typography
+                                            variant="h6"
+                                            noWrap
+                                            sx={{
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {product.categoryName}
+                                        </Typography>
+                                    </Box>
+                                </TableCell>
 
-                            <TableCell>
-                                <Button
-                                    component={Link}
-                                    to={`/product-image-table/${product.id}/`}
-                                    variant="contained"
-                                    color="primary"
-                                    startIcon={<PermMediaIcon />}
-                                >
-                                    Variant
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    color="error" // Use "error" for the red button color in Material-UI
-                                    onClick={() => handleDeleteConfirmation(product.id)}
-                                    startIcon={<DeleteIcon />}
-                                >
-                                    Delete
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => handleUpdate(product.id, product.name)}
-                                    startIcon={<EditIcon />}
-                                >
-                                    Update
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table >
+                                <TableCell>
+                                    <Button
+                                        component={Link}
+                                        to={`/product-image-table/${product.id}/`}
+                                        variant="contained"
+                                        color="primary"
+                                        startIcon={<PermMediaIcon />}
+                                    >
+                                        Variant
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDeleteConfirmation(product.id)}
+                                        startIcon={<DeleteIcon />}
+                                    >
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<EditIcon />}
+                                        onClick={() => handleUpdateClick(product.id)} 
+                                    >
+                                        Update
+                                    </Button>
+                                </TableCell>
+
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table >
             )}
 
             {/* Delete Confirmation Dialog */}
@@ -282,22 +257,6 @@ const TableBanner = () => {
                 </DialogActions>
             </Dialog >
 
-            {/* Edit Product Dialog */}
-            < Dialog open={editDialogOpen} onClose={handleEditDialogClose} >
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Product Name"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button onClick={handleSaveEdit} variant="contained" color="primary">Save</Button>
-                </DialogActions>
-            </Dialog >
         </>
     );
 };
