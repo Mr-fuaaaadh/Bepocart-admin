@@ -62,6 +62,8 @@ const OrderProductsTable = lazy(() =>
 );
 
 const CoupenTable = lazy(() => import("../views/Coupens/CoupenTable.js"));
+const CoupenForm = lazy(() => import("../views/Coupens/Form.js"));
+
 
 const Login = lazy(() => import("../components/Login.js"));
 
@@ -111,7 +113,9 @@ const ThemeRoutes = [
 
       { path: "order-table/", element: <OrderTable /> },
       { path: "order-product-table/:id", element: <OrderProductsTable /> },
+
       { path: "coupen-table/", element: <CoupenTable /> },
+      { path: "coupen-form/", element: <CoupenForm /> },
     ],
   },
 ];

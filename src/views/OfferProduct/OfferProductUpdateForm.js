@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom"; // Assuming you're using React Router
-
+import { useParams } from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -18,9 +17,10 @@ import {
     FormControl,
     InputLabel,
 } from "@mui/material";
+import { parseISO, format } from "date-fns";
 
 const FbDefaultForm = () => {
-    const { id } = useParams(); // Get id from URL params
+    const { id } = useParams();
 
     const [state, setState] = useState({
         name: "",
@@ -92,7 +92,7 @@ const FbDefaultForm = () => {
                     },
                 });
 
-                const productData = response.data.data; // Adjust this based on your API response structure
+                const productData = response.data.data;
 
                 setState({
                     name: productData.name,
@@ -102,11 +102,11 @@ const FbDefaultForm = () => {
                     price: productData.price,
                     discount: productData.discount,
                     description: productData.description,
-                    offerBanner: productData.offerBanner,
-                    shortDescription: productData.shortDescription,
-                    offerType: productData.offerType,
-                    offerStartDate: productData.offerStartDate,
-                    offerEndDate: productData.offerEndDate,
+                    offerBanner: productData.offer_banner,
+                    shortDescription: productData.short_description,
+                    offerType: productData.offer_type,
+                    offerStartDate: format(parseISO(productData.offer_start_date), "yyyy-MM-dd'T'HH:mm"),
+                    offerEndDate: format(parseISO(productData.offer_end_date), "yyyy-MM-dd'T'HH:mm"),
                 });
             } catch (error) {
                 console.error("Error fetching product details", error);
@@ -118,17 +118,15 @@ const FbDefaultForm = () => {
         if (id) {
             fetchProductDetails();
         }
-    }, [id]); // Add id to dependency array
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-    
-        // Convert datetime-local input values to ISO format for backend compatibility
+
         if (name === 'offerStartDate' || name === 'offerEndDate') {
-            const isoDateTime = new Date(value).toISOString();
             setState({
                 ...state,
-                [name]: isoDateTime,
+                [name]: value,
             });
         } else {
             setState({
@@ -137,7 +135,6 @@ const FbDefaultForm = () => {
             });
         }
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -153,16 +150,15 @@ const FbDefaultForm = () => {
         formData.append("discount", state.discount);
         formData.append("offer_banner", state.offerBanner);
         formData.append("description", state.description);
-        formData.append("short_description", state.shortDescription);
-        formData.append("offer_type", state.offerType);
-        formData.append("offer_start_date", state.offerStartDate);
-        formData.append("offer_end_date", state.offerEndDate);
+        formData.append("short_description", state.shortDescription); 
+        formData.append("offer_type", state.offerType); 
+        formData.append("offer_start_date", state.offerStartDate); 
+        formData.append("offer_end_date", state.offerEndDate); 
 
         try {
             const token = localStorage.getItem("token");
             let response;
             if (id) {
-                // Update existing product
                 response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Offer-Product-Update/${id}/`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
@@ -170,7 +166,6 @@ const FbDefaultForm = () => {
                     },
                 });
             } else {
-                // Create new product
                 response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Offer-Product/", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
@@ -401,7 +396,6 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                 />
                             </Grid>
-
                         </Grid>
                         <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>
                             Submit

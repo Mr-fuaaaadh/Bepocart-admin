@@ -285,7 +285,7 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="offerStartDate"  // Corrected to lowercase 'offerStartDate'
+                                    name="OfferStartDate"
                                     label="Offer Start Date"
                                     type="datetime-local"
                                     variant="outlined"
@@ -300,7 +300,7 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="offerEndDate"  // Corrected to lowercase 'offerEndDate'
+                                    name="OfferEndDate"
                                     label="Offer End Date"
                                     type="datetime-local"
                                     variant="outlined"
@@ -313,7 +313,6 @@ const FbDefaultForm = () => {
                                     }}
                                 />
                             </Grid>
-
                             <Grid item xs={12}>
                                 <TextField
                                     name="description"
@@ -328,18 +327,18 @@ const FbDefaultForm = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    name="shortDescription"
-                                    label="Short Description"
-                                    variant="outlined"
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                    sx={{ mb: 2 }}
-                                    value={state.shortDescription}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+    <TextField
+        name="shortDescription"
+        label="Short Description"
+        variant="outlined"
+        fullWidth
+        multiline
+        rows={2}
+        sx={{ mb: 2 }}
+        value={state.shortDescription}
+        onChange={handleChange}
+    />
+</Grid>
 
                         </Grid>
                         <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>

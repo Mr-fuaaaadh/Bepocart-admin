@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
-
 import {
     Typography,
     Box,
@@ -12,17 +11,36 @@ import {
     TableRow,
     Button,
     Chip,
+    Select,
+    MenuItem
 } from "@mui/material";
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case 'pending':
+            return 'red';
+        case 'Processing':
+            return 'yellow';
+        case 'Packing':
+            return 'blue';
+        case 'Completed':
+            return 'green';
+        case 'Refunded':
+            return 'orange';
+        case 'Cancelled':
+            return 'grey';
+        default:
+            return 'inherit';
+    }
+};
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -33,7 +51,7 @@ const TableBanner = () => {
                         'Authorization': `${token}`,
                     },
                 });
-                console.log("Orders   :",response.data.data)
+                console.log("Orders:", response.data.data);
                 if (Array.isArray(response.data.data)) {
                     setProducts(response.data.data);
                 } else {
@@ -50,13 +68,31 @@ const TableBanner = () => {
             } finally {
                 setLoading(false);
             }
-            
         };
-    
-        fetchProducts(); // Call fetchProducts directly here
-    
-    }, [navigate]); // Include navigate in the dependency array if it's used inside useEffect
-    
+
+        fetchProducts();
+    }, [navigate]);
+
+    const handleStatusChange = async (productId, newStatus) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Order-status-update/${productId}/`,
+                { status: newStatus },
+                {
+                    headers: {
+                        'Authorization': `${token}`,
+                    },
+                });
+
+            setProducts((prevProducts) =>
+                prevProducts.map((product) =>
+                    product.id === productId ? { ...product, status: newStatus } : product
+                )
+            );
+        } catch (error) {
+            console.error("Error updating order status:", error);
+        }
+    };
 
     return (
         <>
@@ -76,7 +112,7 @@ const TableBanner = () => {
                             <TableCell>Address</TableCell>
                             <TableCell>Total Amount</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell>Coupen</TableCell>
+                            <TableCell>Coupon</TableCell>
                             <TableCell>Payment Method</TableCell>
                             <TableCell>Payment ID</TableCell>
                             <TableCell>Orders</TableCell>
@@ -119,22 +155,30 @@ const TableBanner = () => {
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <Chip
-                                        sx={{
-                                            pl: "4px",
-                                            pr: "4px",
-                                            backgroundColor: product.status === "pending" ? "red" : "green",
-                                            color: "#fff",
-                                        }}
+                                    <Select
+                                        value={product.status}
+                                        onChange={(e) => handleStatusChange(product.id, e.target.value)}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
                                         size="small"
-                                        label={product.status}
-                                    />
+                                        sx={{
+                                            color: getStatusColor(product.status),
+                                            minWidth: '120px', // Example: Set minimum width for consistency
+                                        }}
+                                    >
+                                        <MenuItem value="pending">Pending</MenuItem>
+                                        <MenuItem value="Processing">Processing</MenuItem>
+                                        <MenuItem value="Packing">Packing</MenuItem>
+                                        <MenuItem value="Completed">Completed</MenuItem>
+                                        <MenuItem value="Refunded">Refunded</MenuItem>
+                                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                                    </Select>
                                 </TableCell>
+
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography variant="body1" noWrap
                                             sx={{ color: product.couponName ? 'inherit' : 'red' }}>
-
                                             <LocalOfferIcon sx={{ mr: 1 }} />
                                             {product.couponName ? product.couponName : "No coupon "}
                                         </Typography>
