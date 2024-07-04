@@ -63,7 +63,13 @@ const OrderProductsTable = lazy(() =>
 
 const CoupenTable = lazy(() => import("../views/Coupens/CoupenTable.js"));
 const CoupenForm = lazy(() => import("../views/Coupens/Form.js"));
+const CoupenUpdate = lazy(() => import("../views/Coupens/UpdateForm.js"));
 
+const BlogForm = lazy(() => import("../views/Blog/Form.js"));
+const BlogTable = lazy(() => import("../views/Blog/BlogTable.js"));
+const BlogUpdate = lazy(() => import("../views/Blog/UpdateForm.js"));
+
+const UserTable = lazy(() => import("../views/User/Table.js"));
 
 const Login = lazy(() => import("../components/Login.js"));
 
@@ -116,6 +122,17 @@ const ThemeRoutes = [
 
       { path: "coupen-table/", element: <CoupenTable /> },
       { path: "coupen-form/", element: <CoupenForm /> },
+      { path: "update-coupon/:id/", element: <CoupenUpdate /> },
+
+      { path: "blog-form/", element: <BlogForm /> },
+      { path: "blog-table/", element: <BlogTable /> },
+      { path: "blog-update/:id/", element: <BlogUpdate /> },
+
+      { path: "user-table/", element: <UserTable /> },
+      
+
+
+
     ],
   },
 ];

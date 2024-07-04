@@ -2,7 +2,7 @@ import React from "react";
 
 import { Grid } from "@mui/material";
 
-import { FbDefaultForm } from "./CouponIndex";
+import { FbDefaultForm } from "./UpdateIndex";
 
 const FormLayouts = () => {
   return (

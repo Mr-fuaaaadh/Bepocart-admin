@@ -71,6 +71,17 @@ const Menuitems = [
     href: "/coupen-table/",
   },
 
+  {
+    title: "Blog",
+    icon: MilitaryTechSharpIcon,
+    href: "/blog-table/",
+  },
+
+  {
+    title: "User",
+    icon: MilitaryTechSharpIcon,
+    href: "/user-table/",
+  },
 
   {
     title: "Autocomplete",

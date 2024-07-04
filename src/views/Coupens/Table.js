@@ -1,345 +1,181 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link, useNavigate } from 'react-router-dom';
 import {
-    Card,
-    CardContent,
-    Divider,
-    Box,
     Typography,
-    TextField,
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
     Button,
-    Grid,
-    Snackbar,
-    Alert,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-    OutlinedInput,
-    Chip
+    Chip,
 } from "@mui/material";
-import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
-import AdapterDayjs from '@mui/x-date-pickers/AdapterDayjs';
+import { green } from "@mui/material/colors";
+import PermMediaIcon from '@mui/icons-material/PermMedia';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
-const FbDefaultForm = () => {
-    const [formData, setFormData] = useState({
-        code: "",
-        coupon_type: "",
-        discount: "",
-        start_date: null,  // Initialize with null
-        end_date: null,    // Initialize with null
-        status: "",
-        max_uses: "",
-        used_count: "",
-        discount_product: [],
-        discount_category: [],
-    });
-
+const TableBanner = () => {
     const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const productResponse = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
-                });
-                setProducts(productResponse.data.data);
-
-                const categoryResponse = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
-                });
-                setCategories(categoryResponse.data.data);
-            } catch (error) {
-                console.error("Error fetching data", error);
-                setSnackbarSeverity("error");
-                setSnackbarMessage("Failed to fetch products or categories.");
-                setOpenSnackbar(true);
-            }
-        };
-
-        fetchData();
+        fetchProducts();
     }, []);
 
-    const handleCloseSnackbar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpenSnackbar(false);
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
+    const fetchProducts = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const formattedData = {
-                ...formData,
-                start_date: formData.start_date.toISOString(), // Convert to ISO string
-                end_date: formData.end_date.toISOString(),     // Convert to ISO string
-            };
-            const response = await axios.post('http://127.0.0.1:8000/admin/Bepocart-promotion-coupen/', formattedData, {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-views/", {
                 headers: {
-                    Authorization: `${token}`,
+                    'Authorization': `${token}`,
                 },
             });
-            console.log('Coupon created successfully:', response.data);
-            setSnackbarSeverity("success");
-            setSnackbarMessage("Coupon created successfully");
-            setOpenSnackbar(true);
-            setFormData({
-                code: "",
-                coupon_type: "",
-                discount: "",
-                start_date: null,  // Reset to null after submission
-                end_date: null,    // Reset to null after submission
-                status: "",
-                max_uses: "",
-                used_count: "",
-                discount_product: [],
-                discount_category: [],
-            });
+            setProducts(response.data);
         } catch (error) {
-            console.error('Error creating coupon:', error);
-            setSnackbarSeverity("error");
-            setSnackbarMessage("Failed to create coupon");
-            setOpenSnackbar(true);
+            console.error("Error fetching products:", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching products");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+    const handleDelete = async (id) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-delete/${id}/`, {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+            fetchProducts();
+        } catch (error) {
+            console.error("Error deleting coupon:", error);
+            setError("Error deleting coupon");
+        }
     };
 
-    const handleDateTimeChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
-
-    const handleMultipleChange = (event, field) => {
-        const { target: { value } } = event;
-        setFormData({
-            ...formData,
-            [field]: value
-        });
-    };
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>{error}</div>;
 
     return (
-        <div>
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-
-            <Card variant="outlined" sx={{ p: 0 }}>
-                <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
-                    <Box flexGrow={1}>
-                        <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
-                            Coupon Form
-                        </Typography>
-                    </Box>
-                </Box>
-                <Divider />
-                <CardContent sx={{ padding: "30px" }}>
-                    <form onSubmit={handleSubmit}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    name="code"
-                                    label="Code"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={formData.code}
-                                    onChange={handleChange}
-                                    sx={{ mb: 2 }}
+        <>
+            <Table aria-label="simple table" sx={{ mt: 3, whiteSpace: "nowrap" }}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>ID</TableCell>
+                        <TableCell>COUPEN</TableCell>
+                        <TableCell>TYPE</TableCell>
+                        <TableCell>DISCOUNT</TableCell>
+                        <TableCell>START DATE</TableCell>
+                        <TableCell>END DATE</TableCell>
+                        <TableCell>STATUS</TableCell>
+                        <TableCell>PRODUCTS</TableCell>
+                        <TableCell>CATEGORY</TableCell>
+                        <TableCell>ACTIONS</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {products.map((product) => (
+                        <TableRow key={product.id}>
+                            <TableCell>{product.id}</TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <Typography variant="body1" noWrap>
+                                            {product.code}
+                                        </Typography>
+                                    </Link>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.coupon_type}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.discount}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.start_date}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.end_date}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Chip
+                                    sx={{
+                                        pl: "4px",
+                                        pr: "4px",
+                                        backgroundColor: product.status === "In Active" ? "red" : (product.status === "Active" ? green[500] : product.pbg),
+                                        color: "#fff",
+                                    }}
+                                    size="small"
+                                    label={product.status}
                                 />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                    <InputLabel id="coupon-type-label">Coupon Type</InputLabel>
-                                    <Select
-                                        labelId="coupon-type-label"
-                                        id="coupon_type"
-                                        name="coupon_type"
-                                        value={formData.coupon_type}
-                                        onChange={handleChange}
-                                        input={<OutlinedInput label="Coupon Type" />}
-                                    >
-                                        <MenuItem value="Percentage">Percentage</MenuItem>
-                                        <MenuItem value="Fixed Amount">Fixed Amount</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    name="discount"
-                                    label="Discount"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={formData.discount}
-                                    onChange={handleChange}
-                                    sx={{ mb: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <DateTimePicker
-                                    label="Start Date"
-                                    value={formData.start_date}
-                                    onChange={(value) => handleDateTimeChange("start_date", value)}
-                                    renderInput={(props) => (
-                                        <TextField
-                                            {...props}
-                                            fullWidth
-                                            variant="outlined"
-                                            sx={{ mb: 2 }}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            inputProps={{
-                                                step: 300, // 5 min intervals
-                                            }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <DateTimePicker
-                                    label="End Date"
-                                    value={formData.end_date}
-                                    onChange={(value) => handleDateTimeChange("end_date", value)}
-                                    renderInput={(props) => (
-                                        <TextField
-                                            {...props}
-                                            fullWidth
-                                            variant="outlined"
-                                            sx={{ mb: 2 }}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            inputProps={{
-                                                step: 300, // 5 min intervals
-                                            }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                    <InputLabel id="status-label">Status</InputLabel>
-                                    <Select
-                                        labelId="status-label"
-                                        id="status"
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleChange}
-                                        input={<OutlinedInput label="Status" />}
-                                    >
-                                        <MenuItem value="Active">Active</MenuItem>
-                                        <MenuItem value="Inactive">Inactive</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    name="max_uses"
-                                    label="Max Uses"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={formData.max_uses}
-                                    onChange={handleChange}
-                                    sx={{ mb: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name="used_count"
-                                    label="Used Count"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={formData.used_count}
-                                    onChange={handleChange}
-                                    sx={{ mb: 2 }}
-                                    type="number" // Ensure input is of type number
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                    <InputLabel id="discount-product-label">Discount Product</InputLabel>
-                                    <Select
-                                        labelId="discount-product-label"
-                                        id="discount_product"
-                                        multiple
-                                        value={formData.discount_product}
-                                        onChange={(e) => handleMultipleChange(e, "discount_product")}
-                                        input={<OutlinedInput label="Discount Product" />}
-                                        renderValue={(selected) => (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                {selected.map((value) => (
-                                                    <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
-                                                ))}
-                                            </Box>
-                                        )}
-                                    >
-                                        {products.map((product) => (
-                                            <MenuItem key={product.id} value={product.id}>
-                                                {product.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                    <InputLabel id="discount-category-label">Discount Category</InputLabel>
-                                    <Select
-                                        labelId="discount-category-label"
-                                        id="discount_category"
-                                        multiple
-                                        value={formData.discount_category}
-                                        onChange={(e) => handleMultipleChange(e, "discount_category")}
-                                        input={<OutlinedInput label="Discount Category" />}
-                                        renderValue={(selected) => (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                {selected.map((value) => (
-                                                    <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
-                                                ))}
-                                            </Box>
-                                        )}
-                                    >
-                                        {categories.map((category) => (
-                                            <MenuItem key={category.id} value={category.id}>
-                                                {category.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button variant="contained" color="primary" type="submit" fullWidth>
-                                    Create Coupon
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.discount_product ? product.discount_product : "No products"}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ maxWidth: "150px" }}>
+                                    <Typography variant="body1" noWrap>
+                                        {product.discount_category}
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    component={Link}
+                                    to={`/update-coupon/${product.id}/`}
+                                    sx={{ mr: 1 }}
+                                    startIcon={<PermMediaIcon />}
+                                >
+                                    Update
                                 </Button>
-                            </Grid>
-                        </Grid>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => handleDelete(product.id)}
+                                    startIcon={<LocalOfferIcon />}
+                                >
+                                    Delete
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </>
     );
 };
 
-export default FbDefaultForm;
+export default TableBanner;
