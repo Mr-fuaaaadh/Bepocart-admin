@@ -208,41 +208,13 @@ const TableBanner = () => {
                 </TableBody>
             </Table>
 
-            <Box mt={7}>
+            <Box mt={7} >
                 <Typography variant="subtitle1">Total Amount: ${totalAmount}</Typography>
                 <Typography variant="subtitle1">Discount Price: ${discountPrice}</Typography>
                 <Typography variant="subtitle1">Coupon Code Charge: ${couponCodeCharge}</Typography>
             </Box>
 
 
-            {/* Delete Confirmation Dialog */}
-            < Dialog open={deleteDialogOpen} onClose={handleCancelDelete} >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body1">Are you sure you want to delete this product?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelDelete}>Cancel</Button>
-                    <Button onClick={handleDelete} variant="contained" color="error">Confirm</Button>
-                </DialogActions>
-            </Dialog >
-
-            {/* Edit Product Dialog */}
-            < Dialog open={editDialogOpen} onClose={handleEditDialogClose} >
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Product Name"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button onClick={handleSaveEdit} variant="contained" color="primary">Save</Button>
-                </DialogActions>
-            </Dialog >
 
         </>
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -25,6 +25,9 @@ import userimg from "../../../assets/images/users/user.jpg";
 
 const Header = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl4, setAnchorEl4] = React.useState(null);
+  const [anchorEl5, setAnchorEl5] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -34,9 +37,6 @@ const Header = (props) => {
     setAnchorEl(null);
   };
 
-  // 4
-  const [anchorEl4, setAnchorEl4] = React.useState(null);
-
   const handleClick4 = (event) => {
     setAnchorEl4(event.currentTarget);
   };
@@ -45,15 +45,20 @@ const Header = (props) => {
     setAnchorEl4(null);
   };
 
-  // 5
-  const [anchorEl5, setAnchorEl5] = React.useState(null);
-
   const handleClick5 = (event) => {
     setAnchorEl5(event.currentTarget);
   };
 
   const handleClose5 = () => {
     setAnchorEl5(null);
+  };
+
+  const handleLogout = () => {
+    // Remove the token from local storage
+    localStorage.removeItem('token');
+
+    // Redirect to the login page
+    navigate('/login');
   };
 
   return (
@@ -97,21 +102,24 @@ const Header = (props) => {
             },
           }}
         >
-          <MenuItem onClick={handleClose5}>
-            <Avatar
-              sx={{
-                width: "35px",
-                height: "35px",
-              }}
-            />
-            <Box
-              sx={{
-                ml: 2,
-              }}
-            >
-              New account
-            </Box>
-          </MenuItem>
+          <Link to="Bepocart-admin-register/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <MenuItem onClick={handleClose5}>
+              <Avatar
+                sx={{
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+              <Box
+                sx={{
+                  ml: 2,
+                }}
+              >
+                New account
+              </Box>
+            </MenuItem>
+          </Link>
+
           <Divider />
           <Link to="size-table/" style={{ textDecoration: 'none', color: 'inherit' }}>
 
@@ -263,7 +271,7 @@ const Header = (props) => {
             </ListItemIcon>
             Settings
           </MenuItem>
-          <MenuItem onClick={handleClose4}>
+          <MenuItem onClick={() => { handleClose4(); handleLogout(); }}>
             <ListItemIcon>
               <LogoutOutlinedIcon fontSize="small" />
             </ListItemIcon>

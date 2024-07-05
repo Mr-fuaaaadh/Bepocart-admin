@@ -141,9 +141,9 @@ const TableBanner = () => {
                                     </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <Box sx={{ maxWidth: "150px" }}>
-                                        <Typography variant="body1" noWrap>
-                                            {product.address}
+                                    <Box sx={{ maxWidth: "250px" }}>
+                                        <Typography variant="body1" >
+                                            {product.created_at}
                                         </Typography>
                                     </Box>
                                 </TableCell>

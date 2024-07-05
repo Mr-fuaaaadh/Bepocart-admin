@@ -71,6 +71,9 @@ const BlogUpdate = lazy(() => import("../views/Blog/UpdateForm.js"));
 
 const UserTable = lazy(() => import("../views/User/Table.js"));
 
+const AdminForm = lazy(() => import("../views/Admin/Form.js"));
+
+
 const Login = lazy(() => import("../components/Login.js"));
 
 /*****Routes******/
@@ -129,6 +132,9 @@ const ThemeRoutes = [
       { path: "blog-update/:id/", element: <BlogUpdate /> },
 
       { path: "user-table/", element: <UserTable /> },
+
+      { path: "Bepocart-admin-register/", element: <AdminForm /> },
+
       
 
 
