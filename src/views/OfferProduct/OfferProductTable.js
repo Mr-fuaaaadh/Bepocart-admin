@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { Card, CardContent, Box, Typography, Button } from "@mui/material";
-import ExTable from "./Table.js";
+import { Card, CardContent, Box, Typography, Button, TextField } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
+import TableBanner from "./Table.js";
 
 const ProductTable = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    setSubmittedQuery(searchQuery);
+  };
+
   return (
     <Box position="relative">
       <Card variant="outlined">
@@ -11,14 +23,51 @@ const ProductTable = () => {
           <Typography variant="h3">Offer Product Table</Typography>
           <Box
             sx={{
-              overflowX: "auto",  // Allow horizontal scrolling
-              overflowY: "auto",  // Enable vertical scrolling
-              whiteSpace: "nowrap", // Prevent wrapping of table content
-              maxWidth: "100%", // Ensure it fits within the container
-              maxHeight: "800px", // Set a fixed height for vertical scrolling
+              overflowX: "auto",
+              overflowY: "auto",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+              maxHeight: "800px",
+              display: "flex",
+              alignItems: "center",
+              gap: 2, // Add some space between the input and button
+              mb: 2,  // Add some margin at the bottom
             }}
           >
-            <ExTable />
+            <TextField
+              label="Search"
+              placeholder="Search by username / date"
+              variant="outlined"
+              size="small"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              sx={{
+                width: "300px", // Adjust the width
+                height: "40px", // Adjust the height
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              startIcon={<SearchIcon />}
+              sx={{
+                height: "40px", // Match the height of the input field
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
+          <Box
+            sx={{
+              overflowX: "auto",
+              overflowY: "auto",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+              maxHeight: "800px",
+            }}
+          >
+            <TableBanner searchQuery={submittedQuery} />
           </Box>
         </CardContent>
       </Card>
@@ -32,7 +81,7 @@ const ProductTable = () => {
           top: 0,
           left: 0,
           mt: 2,
-          ml: 125, // Adjusted for a more realistic margin
+          ml: 125,
         }}
       >
         Add product

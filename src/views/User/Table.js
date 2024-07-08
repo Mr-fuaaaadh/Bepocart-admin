@@ -13,11 +13,9 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Button,
     CircularProgress,
-    Chip,
 } from "@mui/material";
-import PermMediaIcon from '@mui/icons-material/PermMedia';
+// import PermMediaIcon from '@mui/icons-material/PermMedia';
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);

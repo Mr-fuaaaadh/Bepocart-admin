@@ -10,13 +10,12 @@ import {
     TableHead,
     TableRow,
     Button,
-    Chip,
     Select,
     MenuItem
 } from "@mui/material";
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-
+import PropTypes from 'prop-types';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -36,7 +35,20 @@ const getStatusColor = (status) => {
             return 'inherit';
     }
 };
-const TableBanner = () => {
+
+const highlightText = (text, query) => {
+    if (!query) return text;
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return parts.map((part, index) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+            <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span>
+        ) : (
+            part
+        )
+    );
+};
+
+const TableBanner = ({ searchQuery }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -94,6 +106,11 @@ const TableBanner = () => {
         }
     };
 
+    const filteredProducts = products.filter(product =>
+        product.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.created_at.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <>
             {loading ? (
@@ -107,7 +124,8 @@ const TableBanner = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
-                            <TableCell>Customer Name</TableCell>
+                            <TableCell>ORDER ID</TableCell>
+                            <TableCell>CUSTOMER NAME</TableCell>
                             <TableCell>Customer Image</TableCell>
                             <TableCell>Address</TableCell>
                             <TableCell>Total Amount</TableCell>
@@ -119,14 +137,24 @@ const TableBanner = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product) => (
+                        {filteredProducts.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
+                                        <Link to={`/order-bill/${product.order_id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Typography variant="body1" noWrap>
+                                                {highlightText(product.order_id, searchQuery)}
+                                            </Typography>
+                                        </Link>
+                                    </Box>
+                                </TableCell>
+
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <Typography variant="body1" noWrap>
-                                                {product.customerName}
+                                                {highlightText(product.customerName, searchQuery)}
                                             </Typography>
                                         </Link>
                                     </Box>
@@ -142,8 +170,8 @@ const TableBanner = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "250px" }}>
-                                        <Typography variant="body1" >
-                                            {product.created_at}
+                                        <Typography variant="body1">
+                                            {highlightText(product.created_at, searchQuery)}
                                         </Typography>
                                     </Box>
                                 </TableCell>
@@ -208,7 +236,6 @@ const TableBanner = () => {
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography variant="body1" noWrap>
                                             {product.payment_id ? product.payment_id : "N/A"}
-
                                         </Typography>
                                     </Box>
                                 </TableCell>
@@ -231,6 +258,10 @@ const TableBanner = () => {
             )}
         </>
     );
+};
+
+TableBanner.propTypes = {
+    searchQuery: PropTypes.string.isRequired,
 };
 
 export default TableBanner;

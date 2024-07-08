@@ -56,9 +56,11 @@ const OfferProductTable = lazy(() =>
   import("../views/OfferProduct/OfferProductTable.js")
 );
 
+const OrderBill = lazy(() => import("../views/Orders/Bill.js"));
 const OrderTable = lazy(() => import("../views/Orders/OrderTable.js"));
 const OrderProductsTable = lazy(() =>
   import("../views/Orders/OrderProductTable.js")
+
 );
 
 const CoupenTable = lazy(() => import("../views/Coupens/CoupenTable.js"));
@@ -99,6 +101,7 @@ const ThemeRoutes = [
       { path: "form-elements/switch", element: <ExSwitch /> },
       { path: "banner-form/", element: <BannerForm /> },
       { path: "banner-table/", element: <BannerTable /> },
+
       { path: "offer-banner-table/", element: <OfferBannerTable /> },
       { path: "offer-banner-form/", element: <OfferBannerForm /> },
 
@@ -110,8 +113,12 @@ const ThemeRoutes = [
       { path: "category-table/", element: <CategoryTable /> },
       { path: "subcategory-form/", element: <SubcategoryForm /> },
       { path: "subcategory-table/", element: <SubcategoryTable /> },
+
+
       { path: "size-table/", element: <SizeTable /> },
       { path: "size-form/", element: <SizeForm /> },
+
+
       { path: "product-image-table/:id", element: <ProductImagesTable /> },
       { path: "product-image-form/:id", element: <ProductImageForm /> },
 
@@ -122,6 +129,8 @@ const ThemeRoutes = [
 
       { path: "order-table/", element: <OrderTable /> },
       { path: "order-product-table/:id", element: <OrderProductsTable /> },
+      { path: "order-bill/:order_id/", element: <OrderBill /> },
+
 
       { path: "coupen-table/", element: <CoupenTable /> },
       { path: "coupen-form/", element: <CoupenForm /> },

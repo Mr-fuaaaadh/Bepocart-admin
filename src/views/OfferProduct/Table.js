@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-
-
-
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Typography,
     Box,
@@ -19,14 +15,13 @@ import {
     DialogContent,
     CircularProgress,
     DialogActions,
-    TextField,
     Chip,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 
-const TableBanner = () => {
+const TableBanner = ({ searchQuery }) => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -34,15 +29,13 @@ const TableBanner = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-
     useEffect(() => {
         fetchProducts();
     }, []);
 
-    // Adjusted fetchProducts function with error handling and loading state management
     const fetchProducts = async () => {
         setLoading(true);
-        setError(null); 
+        setError(null);
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Products/", {
@@ -64,10 +57,9 @@ const TableBanner = () => {
                 setError("Error fetching banners");
             }
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
-
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -81,17 +73,16 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`,{
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
-                    },
+                },
             });
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
             console.error("Error deleting product:", error);
             setError("Error deleting product");
-
         }
     };
 
@@ -100,6 +91,9 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <>
@@ -125,7 +119,7 @@ const TableBanner = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product) => (
+                        {filteredProducts.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
@@ -191,7 +185,7 @@ const TableBanner = () => {
                                 <TableCell>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleUpdateClick(product.id)} 
+                                        onClick={() => handleUpdateClick(product.id)}
                                         startIcon={<EditIcon />}
                                     >
                                         Update

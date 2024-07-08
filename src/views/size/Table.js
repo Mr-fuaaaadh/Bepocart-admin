@@ -63,7 +63,8 @@ const CategoryTable = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }
+    ;
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
