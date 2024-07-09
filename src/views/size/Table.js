@@ -73,7 +73,7 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-size-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -99,7 +99,7 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-size-update/${editProductId}/`, {
                 name: editedProductName,
                 // Add other fields you want to update
             });

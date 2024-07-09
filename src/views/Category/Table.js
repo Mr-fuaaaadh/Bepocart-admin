@@ -49,6 +49,7 @@ const CategoryTable = () => {
     
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
+                
             } else {
                 console.error("Invalid data format:", response.data);
                 setError("Invalid data format");

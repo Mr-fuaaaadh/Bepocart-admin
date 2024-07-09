@@ -67,6 +67,14 @@ const CoupenTable = lazy(() => import("../views/Coupens/CoupenTable.js"));
 const CoupenForm = lazy(() => import("../views/Coupens/Form.js"));
 const CoupenUpdate = lazy(() => import("../views/Coupens/UpdateForm.js"));
 
+
+const CoinForm = lazy(() => import("../views/Bcoin/Form.js"));
+const CoinTable = lazy(() => import("../views/Bcoin/CoinTable.js"));
+
+const CustomerCoinTable = lazy(() => import("../views/Bcoin/CustomerTable.js"));
+
+
+
 const BlogForm = lazy(() => import("../views/Blog/Form.js"));
 const BlogTable = lazy(() => import("../views/Blog/BlogTable.js"));
 const BlogUpdate = lazy(() => import("../views/Blog/UpdateForm.js"));
@@ -141,6 +149,15 @@ const ThemeRoutes = [
       { path: "blog-update/:id/", element: <BlogUpdate /> },
 
       { path: "user-table/", element: <UserTable /> },
+
+      { path: "Bepocart-Coin/", element: <CoinForm /> },
+      { path: "coin-table/", element: <CoinTable /> },
+
+
+      { path: "user-coin-data/:id/", element: <CustomerCoinTable /> },
+
+
+
 
       { path: "Bepocart-admin-register/", element: <AdminForm /> },
 

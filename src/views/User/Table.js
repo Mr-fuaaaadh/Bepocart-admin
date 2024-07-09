@@ -88,7 +88,7 @@ const TableBanner = () => {
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
-                                        <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <Link to={`/user-coin-data/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <Typography variant="h6" noWrap>
                                                 {product.first_name} {product.last_name}
                                             </Typography>
@@ -96,7 +96,7 @@ const TableBanner = () => {
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <Link to={`/user-coin-data/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image}`}
                                             alt={product.name}

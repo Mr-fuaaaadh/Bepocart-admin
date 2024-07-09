@@ -15,6 +15,12 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AdUnitsIcon from '@mui/icons-material/AdUnits';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MilitaryTechSharpIcon from '@mui/icons-material/MilitaryTechSharp';
+import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
+import PeopleIcon from '@mui/icons-material/People';
+import NewspaperSharpIcon from '@mui/icons-material/NewspaperSharp';
+
+
+
 
 
 const Menuitems = [
@@ -73,14 +79,20 @@ const Menuitems = [
 
   {
     title: "Blog",
-    icon: MilitaryTechSharpIcon,
+    icon: NewspaperSharpIcon,
     href: "/blog-table/",
   },
 
   {
     title: "User",
-    icon: MilitaryTechSharpIcon,
+    icon: PeopleIcon,
     href: "/user-table/",
+  },
+
+  {
+    title: "B coin",
+    icon: CurrencyBitcoinIcon,
+    href: "/coin-table/",
   },
 
   {
