@@ -13,10 +13,10 @@ const CategoryTable = () => {
           <Typography variant="h3">COIN</Typography>
           <Box
             sx={{
-              overflow: {
-                xs: "auto",
-                sm: "unset",
-              },
+              overflowX: "auto",  
+              overflowY: "hidden", 
+              whiteSpace: "nowrap", 
+              maxWidth: "100%", 
             }}
           >
             <ExTable />

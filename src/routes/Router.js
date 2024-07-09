@@ -71,6 +71,10 @@ const CoupenUpdate = lazy(() => import("../views/Coupens/UpdateForm.js"));
 const CoinForm = lazy(() => import("../views/Bcoin/Form.js"));
 const CoinTable = lazy(() => import("../views/Bcoin/CoinTable.js"));
 
+
+const ReviewTable = lazy(() => import("../views/Review/ReviewTable.js"));
+
+
 const CustomerCoinTable = lazy(() => import("../views/Bcoin/CustomerTable.js"));
 
 
@@ -157,9 +161,10 @@ const ThemeRoutes = [
       { path: "user-coin-data/:id/", element: <CustomerCoinTable /> },
 
 
-
-
       { path: "Bepocart-admin-register/", element: <AdminForm /> },
+
+      { path: "Bepocart-product-reviews/", element: <ReviewTable /> },
+
 
       
 

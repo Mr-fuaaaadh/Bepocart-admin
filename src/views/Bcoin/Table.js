@@ -30,6 +30,11 @@ const CoinTable = () => {
     const [editedCoinValue, setEditedCoinValue] = useState("");
     const [editedLoginValue, setEditedLoginValue] = useState("");
     const [editedPaymentValue, setEditedPaymentValue] = useState("");
+    const [editedFirstPaymentValue, setEditedFirstPaymentValue] = useState("");
+    const [editedReferralPoint, setEditedReferralPoint] = useState("");
+    const [editedReviewReward, setEditedReviewReward] = useState("");
+    const [editedBirthdayReward, setEditedBirthdayReward] = useState("");
+    const [editedAnniversaryReward, setEditedAnniversaryReward] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -97,12 +102,17 @@ const CoinTable = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, coin, value, loginValue, paymentValue) => {
+    const handleUpdate = (id, coin, value, loginValue, paymentValue, firstPaymentValue, referralPoint, reviewReward, birthdayReward, anniversaryReward) => {
         setEditCoinId(id);
         setEditedCoinQuantity(coin);
         setEditedCoinValue(value);
         setEditedLoginValue(loginValue);
         setEditedPaymentValue(paymentValue);
+        setEditedFirstPaymentValue(firstPaymentValue);
+        setEditedReferralPoint(referralPoint);
+        setEditedReviewReward(reviewReward);
+        setEditedBirthdayReward(birthdayReward);
+        setEditedAnniversaryReward(anniversaryReward);
         setEditDialogOpen(true);
     };
 
@@ -119,6 +129,11 @@ const CoinTable = () => {
                 value: editedCoinValue,
                 login_value: editedLoginValue,
                 payment_value: editedPaymentValue,
+                first_payment_value: editedFirstPaymentValue,
+                referral_point: editedReferralPoint,
+                review_reward: editedReviewReward,
+                birthday_reward: editedBirthdayReward,
+                anniversary_reward: editedAnniversaryReward,
             }, {
                 headers: {
                     'Authorization': `${token}`,
@@ -133,6 +148,11 @@ const CoinTable = () => {
                     value: editedCoinValue,
                     login_value: editedLoginValue,
                     payment_value: editedPaymentValue,
+                    first_payment_value: editedFirstPaymentValue,
+                    referral_point: editedReferralPoint,
+                    review_reward: editedReviewReward,
+                    birthday_reward: editedBirthdayReward,
+                    anniversary_reward: editedAnniversaryReward,
                 } : coin
             );
             setCoins(updatedCoins);
@@ -161,12 +181,18 @@ const CoinTable = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Value</TableCell>
-                            <TableCell>Login Value</TableCell>
-                            <TableCell>Payment Value</TableCell>
-                            <TableCell>Delete</TableCell>
-                            <TableCell>Update</TableCell>
+                            <TableCell>QUANTITY</TableCell>
+                            <TableCell>VALUE</TableCell>
+                            <TableCell>LOGIN VALUE</TableCell>
+                            <TableCell>FIRST PAYMENT VALUE</TableCell>
+                            <TableCell>PAYMENT VALUE</TableCell>
+                            <TableCell>REFERRAL VALUE</TableCell>
+                            <TableCell>REVIEW VALUE</TableCell>
+                            <TableCell>BIRTHDAY REWARD</TableCell>
+                            <TableCell>ANNIVERSARY REWARD</TableCell>
+                            <TableCell>TIMESTAMP</TableCell>
+                            <TableCell>DELETE</TableCell>
+                            <TableCell>UPDATE</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -176,7 +202,13 @@ const CoinTable = () => {
                                 <TableCell>{coin.coin}</TableCell>
                                 <TableCell>{coin.value}</TableCell>
                                 <TableCell>{coin.login_value}</TableCell>
+                                <TableCell>{coin.first_payment_value}</TableCell>
                                 <TableCell>{coin.payment_value}</TableCell>
+                                <TableCell>{coin.referral_point}</TableCell>
+                                <TableCell>{coin.review_reward}</TableCell>
+                                <TableCell>{coin.birthday_reward}</TableCell>
+                                <TableCell>{coin.anniversary_reward}</TableCell>
+                                <TableCell>{coin.timestamp}</TableCell>
                                 <TableCell>
                                     <Button
                                         color="secondary"
@@ -188,7 +220,18 @@ const CoinTable = () => {
                                 <TableCell>
                                     <Button
                                         color="primary"
-                                        onClick={() => handleUpdate(coin.id, coin.coin, coin.value, coin.login_value, coin.payment_value)}
+                                        onClick={() => handleUpdate(
+                                            coin.id, 
+                                            coin.coin, 
+                                            coin.value, 
+                                            coin.login_value, 
+                                            coin.payment_value,
+                                            coin.first_payment_value,
+                                            coin.referral_point,
+                                            coin.review_reward,
+                                            coin.birthday_reward,
+                                            coin.anniversary_reward
+                                        )}
                                     >
                                         <EditIcon />
                                     </Button>
@@ -251,6 +294,46 @@ const CoinTable = () => {
                         fullWidth
                         value={editedPaymentValue}
                         onChange={(e) => setEditedPaymentValue(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="First Payment Value"
+                        type="number"
+                        fullWidth
+                        value={editedFirstPaymentValue}
+                        onChange={(e) => setEditedFirstPaymentValue(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Referral Point"
+                        type="number"
+                        fullWidth
+                        value={editedReferralPoint}
+                        onChange={(e) => setEditedReferralPoint(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Review Reward"
+                        type="number"
+                        fullWidth
+                        value={editedReviewReward}
+                        onChange={(e) => setEditedReviewReward(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Birthday Reward"
+                        type="number"
+                        fullWidth
+                        value={editedBirthdayReward}
+                        onChange={(e) => setEditedBirthdayReward(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Anniversary Reward"
+                        type="number"
+                        fullWidth
+                        value={editedAnniversaryReward}
+                        onChange={(e) => setEditedAnniversaryReward(e.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>

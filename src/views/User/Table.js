@@ -57,10 +57,6 @@ const TableBanner = () => {
         }
     };
 
-
-    
-
-
     return (
         <>
             {loading ? (

@@ -96,6 +96,12 @@ const Menuitems = [
   },
 
   {
+    title: "Product Review",
+    icon: CurrencyBitcoinIcon,
+    href: "/Bepocart-product-reviews/",
+  },
+
+  {
     title: "Autocomplete",
     icon: AddToPhotosOutlinedIcon,
     href: "/form-elements/autocomplete",
