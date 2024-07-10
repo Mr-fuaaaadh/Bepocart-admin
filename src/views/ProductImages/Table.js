@@ -16,16 +16,18 @@ import {
     DialogActions,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SizeForm from "./SizeForm";
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [sizeDialogOpen, setSizeDialogOpen] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-    const { id } = useParams(); // id is received as a string
+    const { id } = useParams();
 
     useEffect(() => {
         const productId = parseInt(id);
@@ -36,13 +38,11 @@ const TableBanner = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            console.log("token   :",token)
             const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
-            console.log(response.data)
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
             } else {
@@ -69,7 +69,7 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`,{
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -86,8 +86,18 @@ const TableBanner = () => {
         setDeleteDialogOpen(false);
     };
 
+    const handleAddSize = (productId) => {
+        setSelectedProductId(productId);
+        setSizeDialogOpen(true);
+    };
 
-
+    const handleSizeAdded = (newSize) => {
+        setProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                product.id === newSize.productId ? { ...product, sizes: [...product.sizes, newSize] } : product
+            )
+        );
+    };
 
     if (loading) {
         return <Typography>Loading...</Typography>;
@@ -162,7 +172,15 @@ const TableBanner = () => {
                                         style={{ maxWidth: "70px", maxHeight: "70px" }}
                                     />
                                 </TableCell>
-                                <TableCell>{product.size_names}</TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleAddSize(product.id)}
+                                    >
+                                        Add Size
+                                    </Button>
+                                </TableCell>
                                 <TableCell>
                                     <Button
                                         variant="contained"
@@ -192,6 +210,14 @@ const TableBanner = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Size Form Dialog */}
+            <SizeForm
+                open={sizeDialogOpen}
+                onClose={() => setSizeDialogOpen(false)}
+                productId={selectedProductId}
+                onSizeAdded={handleSizeAdded}
+            />
         </>
     );
 };

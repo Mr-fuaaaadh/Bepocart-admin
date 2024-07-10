@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { Navigate } from 'react-router-dom';
-
 import {
     Card,
     CardContent,
@@ -23,114 +21,137 @@ import {
 const FbDefaultForm = () => {
     const { id } = useParams();
     const [state, setState] = useState({
-        name: '',
-        stock: '',
-        category: '',
-        price: '',
-        description: '',
-        shortDescription: '',
+        name: "",
+        stock: "",
+        category: "",
+        price: "", // Ensure price is managed in state if it's used
+        description: "",
+        shortDescription: "",
         file: null,
+        slug: "",
+        salePrice: "", // Ensure salePrice is managed in state
     });
     const [categories, setCategories] = useState([]);
     const [open, setOpen] = useState(false);
-    const [severity, setSeverity] = useState('success');
-    const [message, setMessage] = useState('');
-    const Navigate = useNavigate();
-
+    const [severity, setSeverity] = useState("success");
+    const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
 
-        axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
-            headers: {
-                'Authorization': `${token}`
-            }
-        })
-            .then(response => {
+        axios
+            .get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
+                headers: {
+                    Authorization: `${token}`,
+                },
+            })
+            .then((response) => {
                 setState(response.data.data);
                 console.log("product data:", response.data.data);
             })
-            .catch(error => {
-                setSeverity('error');
-                setMessage('Failed to fetch product data.');
+            .catch((error) => {
+                setSeverity("error");
+                setMessage("Failed to fetch product data.");
                 setOpen(true);
             });
 
-        axios.get(`http://127.0.0.1:8000/admin/Bepocart-subcategories/`, {
-            headers: {
-                'Authorization': `${token}`
-            }
-        })
-            .then(response => {
+        axios
+            .get(`http://127.0.0.1:8000/admin/Bepocart-subcategories/`, {
+                headers: {
+                    Authorization: `${token}`,
+                },
+            })
+            .then((response) => {
                 setCategories(response.data.data);
                 console.log("categories data:", response.data.data);
             })
-            .catch(error => {
-                setSeverity('error');
-                setMessage('Failed to fetch categories.');
+            .catch((error) => {
+                setSeverity("error");
+                setMessage("Failed to fetch categories.");
                 setOpen(true);
             });
     }, [id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const formattedValue = name === 'salePrice' ? parseFloat(value) : value;
-        setState(prevState => ({
+        let formattedValue = value;
+
+        if (name === "slug") {
+            const regex = /^[a-zA-Z0-9-_]+$/;
+            if (!regex.test(value)) {
+                setSeverity("error");
+                setMessage(
+                    'Enter a valid slug consisting of letters, numbers, underscores, or hyphens.'
+                );
+                setOpen(true);
+                return;
+            }
+        }
+
+        setState((prevState) => ({
             ...prevState,
-            [name]: formattedValue
+            [name]: formattedValue,
         }));
     };
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Validate salePrice
         if (isNaN(state.salePrice)) {
-            setSeverity('error');
-            setMessage('Sale price must be a valid number.');
+            setSeverity("error");
+            setMessage("Sale price must be a valid number.");
             setOpen(true);
             return;
         }
-    
+
         const formData = new FormData();
-        formData.append('name', state.name);
-        formData.append('stock', state.stock);
-        formData.append('category', state.category);
-        formData.append('salePrice', state.salePrice); // Ensure salePrice is a valid number
-        formData.append('description', state.description);
-        formData.append('shortDescription', state.shortDescription); // Corrected field name
+        formData.append("name", state.name);
+        formData.append("stock", state.stock);
+        formData.append("category", state.category);
+        formData.append("slug", state.slug);
+        formData.append("salePrice", state.salePrice); // Ensure salePrice is a valid number
+        formData.append("description", state.description);
+        formData.append(
+            "shortDescription",
+            state.shortDescription
+        ); // Corrected field name
         if (state.file) {
-            formData.append('image', state.file);
+            formData.append("image", state.file);
         }
-    
-        const token = localStorage.getItem('token');
-    
-        axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, formData, {
-            headers: {
-                'Authorization': `${token}`,
-                'Content-Type': 'multipart/form-data' // Set Content-Type for FormData
-            }
-        })
-        .then(response => {
-            setSeverity('success');
-            setMessage('Product updated successfully.');
-            setOpen(true);
-        })
-        .catch(error => {
-            if (error.response && error.response.status === 401) {
-                console.log('Token expired or unauthorized access. Redirecting to login page.');
-                Navigate('/login'); 
-            } else {
-                setSeverity('error');
-                setMessage('Failed to update product.');
+
+        const token = localStorage.getItem("token");
+
+        axios
+            .put(
+                `http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `${token}`,
+                        "Content-Type": "multipart/form-data", // Set Content-Type for FormData
+                    },
+                }
+            )
+            .then((response) => {
+                setSeverity("success");
+                setMessage("Product updated successfully.");
                 setOpen(true);
-            }
-        });
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    console.log(
+                        "Token expired or unauthorized access. Redirecting to login page."
+                    );
+                    navigate("/login");
+                } else {
+                    setSeverity("error");
+                    setMessage("Failed to update product.");
+                    setOpen(true);
+                }
+            });
     };
-    
-    
-    
 
     const handleClose = () => {
         setOpen(false);
@@ -138,8 +159,16 @@ const FbDefaultForm = () => {
 
     return (
         <div>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity={severity}
+                    sx={{ width: "100%" }}
+                >
                     {message}
                 </Alert>
             </Snackbar>
@@ -165,12 +194,26 @@ const FbDefaultForm = () => {
                             onChange={handleChange}
                         />
                         <TextField
+                            name="slug"
+                            label="Slug"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.slug}
+                            onChange={handleChange}
+                        />
+                        <TextField
                             name="image"
                             type="file"
                             variant="outlined"
                             fullWidth
                             sx={{ mb: 2 }}
-                            onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                            onChange={(e) =>
+                                setState({
+                                    ...state,
+                                    file: e.target.files[0],
+                                })
+                            }
                         />
                         <TextField
                             name="stock"
@@ -181,7 +224,11 @@ const FbDefaultForm = () => {
                             value={state.stock}
                             onChange={handleChange}
                         />
-                        <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                        <FormControl
+                            fullWidth
+                            variant="outlined"
+                            sx={{ mb: 2 }}
+                        >
                             <InputLabel>Category</InputLabel>
                             <Select
                                 name="category"
@@ -190,7 +237,10 @@ const FbDefaultForm = () => {
                                 label="Category"
                             >
                                 {categories.map((category, index) => (
-                                    <MenuItem key={index} value={category.id}>
+                                    <MenuItem
+                                        key={index}
+                                        value={category.id}
+                                    >
                                         {category.name}
                                     </MenuItem>
                                 ))}
@@ -225,7 +275,7 @@ const FbDefaultForm = () => {
                             multiline
                             rows={2}
                             sx={{ mb: 2 }}
-                            value={state.short_description}
+                            value={state.shortDescription}
                             onChange={handleChange}
                         />
 
@@ -233,7 +283,11 @@ const FbDefaultForm = () => {
                             {/* Add any additional form fields here */}
                         </Grid>
 
-                        <Button type="submit" color="primary" variant="contained">
+                        <Button
+                            type="submit"
+                            color="primary"
+                            variant="contained"
+                        >
                             Submit
                         </Button>
                     </form>

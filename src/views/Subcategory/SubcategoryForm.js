@@ -19,6 +19,7 @@ import {
 const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
+        slug: "",
         file: null,
         mainCategory: "",
         selectedCategoryImage: null,
@@ -40,7 +41,7 @@ const FbDefaultForm = () => {
             const token = localStorage.getItem('token');
             const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-main-categories/", {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `${token}`,
                 },
             });
     
@@ -78,6 +79,7 @@ const FbDefaultForm = () => {
         e.preventDefault();
         const formData = new FormData();
         formData.append("name", state.name);
+        formData.append("slug", state.slug);
         formData.append("category", state.mainCategory);
         if (state.file) {
             formData.append("image", state.file);
@@ -95,6 +97,7 @@ const FbDefaultForm = () => {
             console.log("Success", response.data);
             setState({
                 name: "",
+                slug: "",
                 file: null,
                 mainCategory: "",
                 selectedCategoryImage: null,
@@ -140,6 +143,15 @@ const FbDefaultForm = () => {
                                 fullWidth
                                 sx={{ mb: 2 }}
                                 value={state.name}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                name="slug"
+                                label="Slug"
+                                variant="outlined"
+                                fullWidth
+                                sx={{ mb: 2 }}
+                                value={state.slug}
                                 onChange={handleChange}
                             />
                             <TextField

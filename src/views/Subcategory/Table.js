@@ -33,6 +33,7 @@ const CategoryTable = () => {
     const [editedProductName, setEditedProductName] = useState("");
     const [editedProductImage, setEditedProductImage] = useState(null);
     const [editedMainCategory, setEditedMainCategory] = useState("");
+    const [editedSlug, setEditedSlug] = useState(""); // Added state for edited slug
     const [mainCategories, setMainCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -112,9 +113,10 @@ const CategoryTable = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name, mainCategory) => {
+    const handleUpdate = (id, name, slug, mainCategory) => {
         setEditProductId(id);
         setEditedProductName(name);
+        setEditedSlug(slug); // Set slug in the update state
         setEditedMainCategory(mainCategory);
         setEditDialogOpen(true);
     };
@@ -128,10 +130,11 @@ const CategoryTable = () => {
         try {
             const formData = new FormData();
             formData.append("name", editedProductName);
+            formData.append("slug", editedSlug); // Include slug in form data
             if (editedProductImage) {
                 formData.append("image", editedProductImage);
             }
-            formData.append("mainCategory", editedMainCategory); // Include main category in form data
+            formData.append("category", editedMainCategory);
 
             const token = localStorage.getItem('token');
             await axios.put(`http://127.0.0.1:8000/admin/Bepocart-subcategory-update/${editProductId}/`, formData, {
@@ -141,7 +144,7 @@ const CategoryTable = () => {
             });
 
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName, image: editedProductImage ? URL.createObjectURL(editedProductImage) : product.image, mainCategory: editedMainCategory } : product
+                product.id === editProductId ? { ...product, name: editedProductName, slug: editedSlug, image: editedProductImage ? URL.createObjectURL(editedProductImage) : product.image, mainCategory: editedMainCategory } : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
@@ -170,6 +173,7 @@ const CategoryTable = () => {
                         <TableRow>
                             <TableCell>Id</TableCell>
                             <TableCell>Name</TableCell>
+                            <TableCell>Slug</TableCell> {/* Added column for slug */}
                             <TableCell>Image</TableCell>
                             <TableCell>Delete</TableCell>
                             <TableCell>Update</TableCell>
@@ -206,6 +210,7 @@ const CategoryTable = () => {
                                         </Box>
                                     </Box>
                                 </TableCell>
+                                <TableCell>{product.slug}</TableCell> {/* Display slug */}
                                 <TableCell>
                                     <img
                                         src={`http://127.0.0.1:8000/${product.image}`}
@@ -219,7 +224,7 @@ const CategoryTable = () => {
                                     </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name, product.mainCategory)}>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name, product.slug, product.mainCategory)}>
                                         <EditIcon /> Update
                                     </Button>
                                 </TableCell>
@@ -253,6 +258,14 @@ const CategoryTable = () => {
                         variant="outlined"
                         margin="normal"
                     />
+                    <TextField
+                        label="Slug"
+                        value={editedSlug}
+                        onChange={(e) => setEditedSlug(e.target.value)}
+                        fullWidth
+                        variant="outlined"
+                        margin="normal"
+                    /> {/* Added input field for slug */}
                     <FormControl fullWidth variant="outlined" margin="normal">
                         <InputLabel>Main Category</InputLabel>
                         <Select

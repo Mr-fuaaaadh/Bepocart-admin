@@ -19,10 +19,11 @@ const FbDefaultForm = () => {
         name: "",
         file: null,
         stock: "",
-        category: "", // Category state
+        category: "", 
         price: "",
         description: "",
         shortDescription: "",
+        slug:"",
     });
 
     const [message, setMessage] = useState(null);
@@ -63,6 +64,7 @@ const FbDefaultForm = () => {
         if (state.file) {
             formData.append("image", state.file);
         }
+        formData.append("slug", state.slug);
         formData.append("stock", state.stock);
         formData.append("category", state.category);
         formData.append("salePrice", state.price);
@@ -133,6 +135,15 @@ const FbDefaultForm = () => {
                             fullWidth
                             sx={{ mb: 2 }}
                             value={state.name}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="slug"
+                            label="Slug"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.slug}
                             onChange={handleChange}
                         />
                         <TextField
