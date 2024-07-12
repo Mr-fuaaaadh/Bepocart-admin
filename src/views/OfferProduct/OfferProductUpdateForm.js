@@ -25,7 +25,7 @@ const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
         file: null,
-        stock: "",
+        slug: "",
         category: "",
         discount: "",
         salePrice: "",
@@ -96,7 +96,7 @@ const FbDefaultForm = () => {
 
                 setState({
                     name: productData.name,
-                    stock: productData.stock,
+                    slug: productData.slug,
                     category: productData.category,
                     salePrice: productData.salePrice,
                     price: productData.price,
@@ -143,7 +143,7 @@ const FbDefaultForm = () => {
         if (state.file) {
             formData.append("image", state.file);
         }
-        formData.append("stock", state.stock);
+        formData.append("slug", state.slug);
         formData.append("category", state.category);
         formData.append("price", state.price);
         formData.append("salePrice", state.salePrice);
@@ -179,7 +179,7 @@ const FbDefaultForm = () => {
             setState({
                 name: "",
                 file: null,
-                stock: "",
+                slug: "",
                 category: "",
                 discount: "",
                 salePrice: "",
@@ -246,12 +246,12 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="stock"
-                                    label="Stock"
+                                    name="slug"
+                                    label="slug"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
-                                    value={state.stock}
+                                    value={state.slug}
                                     onChange={handleChange}
                                 />
                             </Grid>
@@ -339,11 +339,12 @@ const FbDefaultForm = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     name="offerStartDate"
                                     label="Offer Start Date"
-                                    type="datetime-local"
+                                    type="date"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
@@ -358,7 +359,7 @@ const FbDefaultForm = () => {
                                 <TextField
                                     name="offerEndDate"
                                     label="Offer End Date"
-                                    type="datetime-local"
+                                    type="date"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
@@ -369,6 +370,9 @@ const FbDefaultForm = () => {
                                     }}
                                 />
                             </Grid>
+
+
+                            
 
                             <Grid item xs={12}>
                                 <TextField

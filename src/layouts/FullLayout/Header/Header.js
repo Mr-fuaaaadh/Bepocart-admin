@@ -121,7 +121,7 @@ const Header = (props) => {
           </Link>
 
           <Divider />
-          <Link to="size-table/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          {/* <Link to="size-table/" style={{ textDecoration: 'none', color: 'inherit' }}>
 
             <MenuItem onClick={handleClose5}>
               <Avatar
@@ -138,7 +138,7 @@ const Header = (props) => {
                 Product Size
               </Box>
             </MenuItem>
-          </Link>
+          </Link> */}
 
           <MenuItem onClick={handleClose5}>
             <Avatar

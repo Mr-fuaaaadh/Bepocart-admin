@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams,Link } from 'react-router-dom';
 
 import {
     Typography,
@@ -28,20 +28,21 @@ const CategoryTable = () => {
     const [editProductId, setEditProductId] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editedProductName, setEditedProductName] = useState("");
+    const [editedProductStock, setEditedProductStock] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
+    const { id } = useParams();  // Access the id parameter from the URL
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        fetchProducts(id);  // Pass the id to fetchProducts
+    }, [id]);
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (id) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token')
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-product-size-view/",{
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-varient-view/${id}/`, {
                 headers: {
                     'Authorization': `${token}`
                 },
@@ -63,8 +64,7 @@ const CategoryTable = () => {
         } finally {
             setLoading(false);
         }
-    }
-    ;
+    };
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -73,7 +73,7 @@ const CategoryTable = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-size-delete/${deleteProductId}/`);
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-varient-delete/${deleteProductId}/`);
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
@@ -86,9 +86,10 @@ const CategoryTable = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleUpdate = (id, name) => {
+    const handleUpdate = (id, name, stock) => {
         setEditProductId(id);
         setEditedProductName(name);
+        setEditedProductStock(stock);
         setEditDialogOpen(true);
     };
 
@@ -99,13 +100,14 @@ const CategoryTable = () => {
 
     const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-size-update/${editProductId}/`, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-varient-update/${editProductId}/`, {
                 name: editedProductName,
+                stock: editedProductStock,
                 // Add other fields you want to update
             });
             // Update product locally
             const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
+                product.id === editProductId ? { ...product, name: editedProductName, stock: editedProductStock } : product
             );
             setProducts(updatedProducts);
             setEditDialogOpen(false);
@@ -134,7 +136,9 @@ const CategoryTable = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
+                            <TableCell>Product</TableCell>
                             <TableCell>Name</TableCell>
+                            <TableCell>Stock</TableCell>
                             <TableCell>Delete</TableCell>
                             <TableCell>Update</TableCell>
                         </TableRow>
@@ -145,8 +149,23 @@ const CategoryTable = () => {
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
+                                    {/* <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}> */}
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.productImage}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    {/* </Link> */}
+                                </TableCell>
+                                <TableCell>
                                     <Box>
-                                        <Typography variant="h6">{product.name}</Typography>
+                                        <Typography variant="h6">{product.size}</Typography>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Box>
+                                        <Typography variant="h6">{product.stock}</Typography>
                                     </Box>
                                 </TableCell>
                                 <TableCell>
@@ -155,7 +174,7 @@ const CategoryTable = () => {
                                     </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.name)}>
+                                    <Button variant="contained" onClick={() => handleUpdate(product.id, product.size, product.stock)}>
                                         <EditIcon/> Update
                                     </Button>
                                 </TableCell>
@@ -177,9 +196,6 @@ const CategoryTable = () => {
                 </DialogActions>
             </Dialog>
 
-           
-
-
             {/* Edit Product Dialog */}
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
                 <DialogTitle>Edit Product</DialogTitle>
@@ -189,6 +205,15 @@ const CategoryTable = () => {
                         value={editedProductName}
                         onChange={(e) => setEditedProductName(e.target.value)}
                         fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Product Stock"
+                        type="number"
+                        value={editedProductStock}
+                        onChange={(e) => setEditedProductStock(e.target.value)}
+                        fullWidth
+                        margin="normal"
                     />
                 </DialogContent>
                 <DialogActions>

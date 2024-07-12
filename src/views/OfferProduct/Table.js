@@ -111,7 +111,7 @@ const TableBanner = ({ searchQuery }) => {
                             <TableCell>Name</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Price</TableCell>
-                            <TableCell>Stock</TableCell>
+                            {/* <TableCell>Stock</TableCell> */}
                             <TableCell>Offer Type</TableCell>
                             <TableCell>Variation</TableCell>
                             <TableCell>Delete</TableCell>
@@ -147,13 +147,13 @@ const TableBanner = ({ searchQuery }) => {
                                         </Typography>
                                     </Box>
                                 </TableCell>
-                                <TableCell>
+                                {/* <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography variant="h6" noWrap color={product.stock === 0 ? 'error' : 'primary'}>
                                             {product.stock === 0 ? 'Stock Out' : 'In Stock'}
                                         </Typography>
                                     </Box>
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell>
                                     <Chip
                                         sx={{ backgroundColor: product.offer_type ? 'warning.main' : 'inherit', pl: '4px', pr: '4px' }}

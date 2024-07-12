@@ -127,7 +127,7 @@ const ThemeRoutes = [
       { path: "subcategory-table/", element: <SubcategoryTable /> },
 
 
-      { path: "size-table/", element: <SizeTable /> },
+      { path: "size-table/:id/", element: <SizeTable /> },
       { path: "size-form/", element: <SizeForm /> },
 
 

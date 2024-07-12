@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
     Typography,
     Box,
@@ -131,46 +131,64 @@ const TableBanner = () => {
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
-                                    <Box sx={{ maxWidth: "150px" }}>
-                                        <Typography variant="h6" noWrap>
-                                            {product.color}
-                                        </Typography>
-                                    </Box>
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <Box sx={{ maxWidth: "150px" }}>
+                                            <Typography variant="h6" noWrap>
+                                                {product.color}
+                                            </Typography>
+                                        </Box>
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image1}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image1}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image2}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image2}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image3}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image3}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image4}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image4}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <img
-                                        src={`http://127.0.0.1:8000/${product.image5}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
+                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+                                        <img
+                                            src={`http://127.0.0.1:8000/${product.image5}`}
+                                            alt={product.name}
+                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
                                     <Button

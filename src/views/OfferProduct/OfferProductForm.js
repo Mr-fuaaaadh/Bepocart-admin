@@ -21,7 +21,7 @@ const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
         file: null,
-        stock: "",
+        slug: "",
         category: "",
         discount: "",
         salePrice: "",
@@ -47,6 +47,7 @@ const FbDefaultForm = () => {
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
+    const [slugError, setSlugError] = useState("");
 
     useEffect(() => {
         const fetchOfferBanners = async () => {
@@ -82,22 +83,74 @@ const FbDefaultForm = () => {
         fetchCategories();
     }, []);
 
+    const validateSlug = (slug) => {
+        const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+        if (!slugRegex.test(slug)) {
+            return "Invalid slug. Only lowercase letters, numbers, and hyphens are allowed.";
+        }
+        return "";
+    };
+
+    const calculateDiscount = (price, salePrice) => {
+        const priceFloat = parseFloat(price);
+        const salePriceFloat = parseFloat(salePrice);
+    
+        if (!isNaN(priceFloat) && !isNaN(salePriceFloat) && priceFloat > 0) {
+            const discount = ((priceFloat - salePriceFloat) / priceFloat) * 100;
+            return discount.toFixed(2); // returns discount as a percentage with 2 decimal places
+        }
+        return "";
+    };
+    
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setState({
-            ...state,
-            [name]: files ? files[0] : value,
-        });
+        if (name === "slug") {
+            const lowerCaseSlug = value.toLowerCase();
+            setSlugError(validateSlug(lowerCaseSlug));
+            setState({
+                ...state,
+                [name]: lowerCaseSlug,
+            });
+        } else {
+            let newState = {
+                ...state,
+                [name]: files ? files[0] : value,
+            };
+    
+            if (name === "price" || name === "salePrice") {
+                const discount = calculateDiscount(newState.price, newState.salePrice);
+                newState = {
+                    ...newState,
+                    discount,
+                };
+            }
+            if (name === "shortDescription" && value.length > 255) {
+                setMessage("Short description cannot exceed 255 characters.");
+                setSeverity("error");
+                setOpen(true);
+                return;
+            }
+    
+            setState(newState);
+        }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (slugError) {
+            setSeverity("error");
+            setMessage(slugError);
+            setOpen(true);
+            return;
+        }
+
         const formData = new FormData();
         formData.append("name", state.name);
         if (state.file) {
             formData.append("image", state.file);
         }
-        formData.append("stock", state.stock);
+        formData.append("slug", state.slug);
         formData.append("category", state.category);
         formData.append("price", state.price);
         formData.append("salePrice", state.salePrice);
@@ -123,7 +176,7 @@ const FbDefaultForm = () => {
             setState({
                 name: "",
                 file: null,
-                stock: "",
+                slug: "",
                 category: "",
                 discount: "",
                 salePrice: "",
@@ -190,13 +243,15 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="stock"
-                                    label="Stock"
+                                    name="slug"
+                                    label="Slug"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
-                                    value={state.stock}
+                                    value={state.slug}
                                     onChange={handleChange}
+                                    error={!!slugError}
+                                    helperText={slugError}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -218,23 +273,23 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="salePrice"
-                                    label="Sale Price"
-                                    variant="outlined"
-                                    fullWidth
-                                    sx={{ mb: 2 }}
-                                    value={state.salePrice}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
                                     name="price"
                                     label="Price"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
                                     value={state.price}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="salePrice"
+                                    label="Sale Price"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.salePrice}
                                     onChange={handleChange}
                                 />
                             </Grid>
@@ -285,9 +340,9 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="OfferStartDate"
+                                    name="offerStartDate"
                                     label="Offer Start Date"
-                                    type="datetime-local"
+                                    type="date"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
@@ -300,9 +355,9 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="OfferEndDate"
+                                    name="offerEndDate"
                                     label="Offer End Date"
-                                    type="datetime-local"
+                                    type="date"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
@@ -327,19 +382,18 @@ const FbDefaultForm = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-    <TextField
-        name="shortDescription"
-        label="Short Description"
-        variant="outlined"
-        fullWidth
-        multiline
-        rows={2}
-        sx={{ mb: 2 }}
-        value={state.shortDescription}
-        onChange={handleChange}
-    />
-</Grid>
-
+                                <TextField
+                                    name="shortDescription"
+                                    label="Short Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    sx={{ mb: 2 }}
+                                    value={state.shortDescription}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
                         </Grid>
                         <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>
                             Submit

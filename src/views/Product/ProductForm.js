@@ -18,7 +18,6 @@ const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
         file: null,
-        stock: "",
         category: "", 
         price: "",
         description: "",
@@ -65,7 +64,6 @@ const FbDefaultForm = () => {
             formData.append("image", state.file);
         }
         formData.append("slug", state.slug);
-        formData.append("stock", state.stock);
         formData.append("category", state.category);
         formData.append("salePrice", state.price);
         formData.append("description", state.description);
@@ -91,7 +89,6 @@ const FbDefaultForm = () => {
             setState({
                 name: "",
                 file: null,
-                stock: "",
                 category: "",
                 price: "",
                 description: "",
@@ -154,7 +151,7 @@ const FbDefaultForm = () => {
                             sx={{ mb: 2 }}
                             onChange={(e) => setState({ ...state, file: e.target.files[0] })}
                         />
-                        <TextField
+                        {/* <TextField
                             name="stock"
                             label="Stock"
                             variant="outlined"
@@ -162,7 +159,7 @@ const FbDefaultForm = () => {
                             sx={{ mb: 2 }}
                             value={state.stock}
                             onChange={handleChange}
-                        />
+                        /> */}
                         <TextField
                             select
                             name="category"

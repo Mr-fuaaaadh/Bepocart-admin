@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const SizeForm = ({ open, onClose, onSizeAdded, productId }) => {
     const [size, setSize] = useState("");
     const [quantity, setQuantity] = useState("");
-    const location = useLocation();
+    const { id } = useParams();  // Access the id parameter from the URL
 
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const productIdFromQuery = queryParams.get("product_id");
-        // setProductId(productIdFromQuery); // Not needed since productId is passed as prop
-    }, [location]);
+
+
+
+    console.log("Product Id     :",id)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,6 +26,7 @@ const SizeForm = ({ open, onClose, onSizeAdded, productId }) => {
             const response = await axios.post(`http://127.0.0.1:8000/admin/Bepocart-product-varient/${productId}/`, {
                 size,
                 stock: quantity,
+                product: parseInt(id)
             }, {
                 headers: {
                     'Authorization': `Token ${token}`,

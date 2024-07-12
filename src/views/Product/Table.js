@@ -128,7 +128,7 @@ const TableBanner = ({ searchQuery }) => {
                             <TableCell>Name</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Price</TableCell>
-                            <TableCell>Stock</TableCell>
+                            {/* <TableCell>Stock</TableCell> */}
                             <TableCell>Category</TableCell>
                             <TableCell>Variation</TableCell>
                             <TableCell>Delete</TableCell>
@@ -180,7 +180,7 @@ const TableBanner = ({ searchQuery }) => {
                                         </Typography>
                                     </Box>
                                 </TableCell>
-                                <TableCell>
+                                {/* <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography
                                             variant="h6"
@@ -195,7 +195,7 @@ const TableBanner = ({ searchQuery }) => {
                                             {product.stock === 0 ? 'Stock Out' : 'Stock In'}
                                         </Typography>
                                     </Box>
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography
