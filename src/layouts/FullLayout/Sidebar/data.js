@@ -60,9 +60,9 @@ const Menuitems = [
   },
 
   {
-    title: "Offer Product",
-    icon: LocalOfferIcon,
-    href: "/offer-product-table/",
+    title: "Bogo",
+    icon: InventoryIcon,
+    href: "/Bepocart-bogo/",
   },
 
   {

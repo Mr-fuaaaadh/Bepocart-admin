@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -12,145 +12,191 @@ import {
     Grid,
     Alert,
     Snackbar,
-    MenuItem,
     Select,
-    InputLabel,
+    MenuItem,
     FormControl,
+    InputLabel,
 } from "@mui/material";
 
 const FbDefaultForm = () => {
     const { id } = useParams();
+
     const [state, setState] = useState({
         name: "",
-        stock: "",
-        category: "",
-        price: "", // Ensure price is managed in state if it's used
-        description: "",
-        shortDescription: "",
         file: null,
         slug: "",
-        salePrice: "", // Ensure salePrice is managed in state
+        category: "",
+        discount: "",
+        salePrice: "",
+        price: "",
+        description: "",
+        shortDescription: "",
     });
+
     const [categories, setCategories] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
-    const [message, setMessage] = useState("");
-    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-
-        axios
-            .get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
-                headers: {
-                    Authorization: `${token}`,
-                },
-            })
-            .then((response) => {
-                setState(response.data.data);
-                console.log("product data:", response.data.data);
-            })
-            .catch((error) => {
-                setSeverity("error");
-                setMessage("Failed to fetch product data.");
-                setOpen(true);
-            });
-
-        axios
-            .get(`http://127.0.0.1:8000/admin/Bepocart-subcategories/`, {
-                headers: {
-                    Authorization: `${token}`,
-                },
-            })
-            .then((response) => {
+        const fetchCategories = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
                 setCategories(response.data.data);
-                console.log("categories data:", response.data.data);
-            })
-            .catch((error) => {
-                setSeverity("error");
-                setMessage("Failed to fetch categories.");
-                setOpen(true);
-            });
+            } catch (error) {
+                handleApiError("Failed to fetch categories.", error);
+            }
+        };
+
+        const fetchProductDetails = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
+
+                const productData = response.data.data;
+
+                setState({
+                    name: productData.name,
+                    slug: productData.slug,
+                    category: productData.category,
+                    salePrice: productData.salePrice,
+                    price: productData.price,
+                    discount: productData.discount,
+                    description: productData.description,
+                    shortDescription: productData.short_description,
+                });
+            } catch (error) {
+                console.error("Error fetching product details", error);
+            }
+        };
+
+        fetchCategories();
+        if (id) {
+            fetchProductDetails();
+        }
     }, [id]);
 
+    const calculateDiscount = (price, salePrice) => {
+        const priceFloat = parseFloat(price);
+        const salePriceFloat = parseFloat(salePrice);
+    
+        if (!isNaN(priceFloat) && !isNaN(salePriceFloat) && priceFloat > 0) {
+            const discount = ((priceFloat - salePriceFloat) / priceFloat) * 100;
+            return discount.toFixed(2); // returns discount as a percentage with 2 decimal places
+        }
+        return "";
+    };
+    
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        let formattedValue = value;
+        const { name, value, files } = e.target;
+
+        let newState = {
+            ...state,
+            [name]: files ? files[0] : value,
+        };
 
         if (name === "slug") {
-            const regex = /^[a-zA-Z0-9-_]+$/;
-            if (!regex.test(value)) {
-                setSeverity("error");
-                setMessage(
-                    'Enter a valid slug consisting of letters, numbers, underscores, or hyphens.'
-                );
-                setOpen(true);
-                return;
-            }
+            const lowerCaseSlug = value.toLowerCase();
+            newState = {
+                ...newState,
+                slug: lowerCaseSlug,
+            };
         }
 
-        setState((prevState) => ({
-            ...prevState,
-            [name]: formattedValue,
-        }));
-    };
+        if (name === "price" || name === "salePrice") {
+            const discount = calculateDiscount(newState.price, newState.salePrice);
+            newState = {
+                ...newState,
+                discount,
+            };
+        }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Validate salePrice
-        if (isNaN(state.salePrice)) {
-            setSeverity("error");
-            setMessage("Sale price must be a valid number.");
-            setOpen(true);
+        if (name === "shortDescription" && value.length > 255) {
+            handleValidationMessage("Short description cannot exceed 255 characters.");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("name", state.name);
-        formData.append("stock", state.stock);
-        formData.append("category", state.category);
-        formData.append("slug", state.slug);
-        formData.append("salePrice", state.salePrice); // Ensure salePrice is a valid number
-        formData.append("description", state.description);
-        formData.append(
-            "shortDescription",
-            state.shortDescription
-        ); // Corrected field name
-        if (state.file) {
-            formData.append("image", state.file);
-        }
+        setState(newState);
+    };
 
-        const token = localStorage.getItem("token");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        axios
-            .put(
-                `http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`,
-                formData,
-                {
+        try {
+            const formData = new FormData();
+            formData.append("name", state.name);
+            if (state.file) {
+                formData.append("image", state.file);
+            }
+            formData.append("slug", state.slug);
+            formData.append("category", state.category);
+            formData.append("price", state.price);
+            formData.append("salePrice", state.salePrice);
+            formData.append("discount", state.discount);
+            formData.append("description", state.description);
+            formData.append("short_description", state.shortDescription);
+
+            const token = localStorage.getItem("token");
+            let response;
+            if (id) {
+                response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, formData, {
                     headers: {
+                        "Content-Type": "multipart/form-data",
                         Authorization: `${token}`,
-                        "Content-Type": "multipart/form-data", // Set Content-Type for FormData
                     },
-                }
-            )
-            .then((response) => {
-                setSeverity("success");
-                setMessage("Product updated successfully.");
-                setOpen(true);
-            })
-            .catch((error) => {
-                if (error.response && error.response.status === 401) {
-                    console.log(
-                        "Token expired or unauthorized access. Redirecting to login page."
-                    );
-                    navigate("/login");
-                } else {
-                    setSeverity("error");
-                    setMessage("Failed to update product.");
-                    setOpen(true);
-                }
+                });
+            } else {
+                response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `${token}`,
+                    },
+                });
+            }
+
+            handleSuccessMessage("Form submitted successfully!");
+            setState({
+                name: "",
+                file: null,
+                slug: "",
+                category: "",
+                discount: "",
+                salePrice: "",
+                price: "",
+                description: "",
+                shortDescription: "",
             });
+        } catch (error) {
+            handleApiError("Failed to submit the form.", error);
+        }
+    };
+
+    const handleApiError = (message, error) => {
+        setSeverity("error");
+        setMessage(message);
+        setOpen(true);
+        console.error("API Error:", error.response ? error.response.data : error.message);
+    };
+
+    const handleValidationMessage = (message) => {
+        setSeverity("error");
+        setMessage(message);
+        setOpen(true);
+    };
+
+    const handleSuccessMessage = (message) => {
+        setSeverity("success");
+        setMessage(message);
+        setOpen(true);
     };
 
     const handleClose = () => {
@@ -159,16 +205,8 @@ const FbDefaultForm = () => {
 
     return (
         <div>
-            <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-            >
-                <Alert
-                    onClose={handleClose}
-                    severity={severity}
-                    sx={{ width: "100%" }}
-                >
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
                     {message}
                 </Alert>
             </Snackbar>
@@ -177,117 +215,124 @@ const FbDefaultForm = () => {
                 <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
                     <Box flexGrow={1}>
                         <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
-                            Product Edit Form
+                            Offer Product Form
                         </Typography>
                     </Box>
                 </Box>
                 <Divider />
                 <CardContent sx={{ padding: "30px" }}>
                     <form onSubmit={handleSubmit}>
-                        <TextField
-                            name="name"
-                            label="Name"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.name}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="slug"
-                            label="Slug"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.slug}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="image"
-                            type="file"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            onChange={(e) =>
-                                setState({
-                                    ...state,
-                                    file: e.target.files[0],
-                                })
-                            }
-                        />
-                        <TextField
-                            name="stock"
-                            label="Stock"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.stock}
-                            onChange={handleChange}
-                        />
-                        <FormControl
-                            fullWidth
-                            variant="outlined"
-                            sx={{ mb: 2 }}
-                        >
-                            <InputLabel>Category</InputLabel>
-                            <Select
-                                name="category"
-                                value={state.category}
-                                onChange={handleChange}
-                                label="Category"
-                            >
-                                {categories.map((category, index) => (
-                                    <MenuItem
-                                        key={index}
-                                        value={category.id}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="name"
+                                    label="Name"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.name}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="image"
+                                    type="file"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="slug"
+                                    label="Slug"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.slug}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select
+                                        name="category"
+                                        value={state.category}
+                                        onChange={handleChange}
+                                        label="Category"
                                     >
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <TextField
-                            name="salePrice"
-                            label="Price"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.salePrice}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="description"
-                            label="Description"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                            rows={4}
-                            sx={{ mb: 2 }}
-                            value={state.description}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="shortDescription"
-                            label="Short Description"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                            rows={2}
-                            sx={{ mb: 2 }}
-                            value={state.shortDescription}
-                            onChange={handleChange}
-                        />
-
-                        <Grid container spacing={2} sx={{ mb: 2 }}>
-                            {/* Add any additional form fields here */}
+                                        {categories.map((category) => (
+                                            <MenuItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="price"
+                                    label="Price"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.price}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="salePrice"
+                                    label="Sale Price"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.salePrice}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="discount"
+                                    label="Discount"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.discount}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="description"
+                                    label="Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    sx={{ mb: 2 }}
+                                    value={state.description}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="shortDescription"
+                                    label="Short Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    sx={{ mb: 2 }}
+                                    value={state.shortDescription}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
                         </Grid>
-
-                        <Button
-                            type="submit"
-                            color="primary"
-                            variant="contained"
-                        >
+                        <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>
                             Submit
                         </Button>
                     </form>

@@ -49,12 +49,6 @@ const ProductImagesTable = lazy(() =>
   import("../views/ProductImages/ProductImageTable.js")
 );
 
-const OfferProductForm = lazy(() => import("../views/OfferProduct/Form.js"));
-const OfferProductUpdateForm = lazy(() => import("../views/OfferProduct/UpdateForm.js"));
-
-const OfferProductTable = lazy(() =>
-  import("../views/OfferProduct/OfferProductTable.js")
-);
 
 const OrderBill = lazy(() => import("../views/Orders/Bill.js"));
 const OrderTable = lazy(() => import("../views/Orders/OrderTable.js"));
@@ -76,6 +70,9 @@ const ReviewTable = lazy(() => import("../views/Review/ReviewTable.js"));
 
 
 const CustomerCoinTable = lazy(() => import("../views/Bcoin/CustomerTable.js"));
+
+const BogoForm = lazy(() => import("../views/Bogo/Form.js"));
+
 
 
 
@@ -134,9 +131,6 @@ const ThemeRoutes = [
       { path: "product-image-table/:id", element: <ProductImagesTable /> },
       { path: "product-image-form/:id", element: <ProductImageForm /> },
 
-      { path: "offer-product-table/", element: <OfferProductTable /> },
-      { path: "offer-product-form/", element: <OfferProductForm /> },
-      { path: "offer-product-update/:id/", element: <OfferProductUpdateForm /> },
 
 
       { path: "order-table/", element: <OrderTable /> },
@@ -164,6 +158,10 @@ const ThemeRoutes = [
       { path: "Bepocart-admin-register/", element: <AdminForm /> },
 
       { path: "Bepocart-product-reviews/", element: <ReviewTable /> },
+
+
+      { path: "Bepocart-Bogo/", element: <BogoForm /> },
+
 
 
       

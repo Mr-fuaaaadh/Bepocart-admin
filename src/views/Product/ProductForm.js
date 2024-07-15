@@ -11,53 +11,140 @@ import {
     Grid,
     Alert,
     Snackbar,
-    MenuItem, // Import MenuItem for select options
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
 } from "@mui/material";
 
 const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
         file: null,
-        category: "", 
+        slug: "",
+        category: "",
+        discount: "",
+        salePrice: "",
         price: "",
         description: "",
+        offerBanner: "",
         shortDescription: "",
-        slug:"",
+        offerType: "",
+        offerStartDate: "",
+        offerEndDate: "",
     });
 
+    const OfferTypes = [
+        { value: "50%", label: "50%" },
+        { value: "BUY 1 GET 1", label: "BUY 1 GET 1" },
+        { value: "FLASH SALE", label: "FLASH SALE" },
+        { value: "BUY 2 GET 1", label: "BUY 2 GET 1" },
+        { value: "DISCOUNT SALE", label: "DISCOUNT SALE" },
+    ];
+
+    const [offerBanners, setOfferBanners] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
-    const [categories, setCategories] = useState([]); // State for storing categories
+    const [slugError, setSlugError] = useState("");
 
     useEffect(() => {
-        fetchCategories(); // Fetch categories on component mount
+        const fetchOfferBanners = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/", {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
+                setOfferBanners(response.data.data);
+            } catch (error) {
+                console.error("Error fetching offer banners", error);
+            }
+        };
+        fetchOfferBanners();
+
+        const fetchCategories = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
+                setCategories(response.data.data);
+            } catch (error) {
+                setSeverity("error");
+                setMessage("Failed to fetch categories.");
+                setOpen(true);
+            }
+        };
+        fetchCategories();
     }, []);
 
-    const fetchCategories = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
-                headers: {
-                    Authorization: `${token}`
-                }
-            });
-            setCategories(response.data.data);
-        } catch (error) {
-            console.error("Error fetching categories:", error);
+    const validateSlug = (slug) => {
+        const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+        if (!slugRegex.test(slug)) {
+            return "Invalid slug. Only lowercase letters, numbers, and hyphens are allowed.";
         }
+        return "";
     };
 
+    const calculateDiscount = (price, salePrice) => {
+        const priceFloat = parseFloat(price);
+        const salePriceFloat = parseFloat(salePrice);
+    
+        if (!isNaN(priceFloat) && !isNaN(salePriceFloat) && priceFloat > 0) {
+            const discount = ((priceFloat - salePriceFloat) / priceFloat) * 100;
+            return discount.toFixed(2); // returns discount as a percentage with 2 decimal places
+        }
+        return "";
+    };
+    
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setState({
-            ...state,
-            [name]: files ? files[0] : value,
-        });
+        if (name === "slug") {
+            const lowerCaseSlug = value.toLowerCase();
+            setSlugError(validateSlug(lowerCaseSlug));
+            setState({
+                ...state,
+                [name]: lowerCaseSlug,
+            });
+        } else {
+            let newState = {
+                ...state,
+                [name]: files ? files[0] : value,
+            };
+    
+            if (name === "price" || name === "salePrice") {
+                const discount = calculateDiscount(newState.price, newState.salePrice);
+                newState = {
+                    ...newState,
+                    discount,
+                };
+            }
+            if (name === "shortDescription" && value.length > 255) {
+                setMessage("Short description cannot exceed 255 characters.");
+                setSeverity("error");
+                setOpen(true);
+                return;
+            }
+    
+            setState(newState);
+        }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (slugError) {
+            setSeverity("error");
+            setMessage(slugError);
+            setOpen(true);
+            return;
+        }
+
         const formData = new FormData();
         formData.append("name", state.name);
         if (state.file) {
@@ -65,34 +152,37 @@ const FbDefaultForm = () => {
         }
         formData.append("slug", state.slug);
         formData.append("category", state.category);
-        formData.append("salePrice", state.price);
+        formData.append("price", state.price);
+        formData.append("salePrice", state.salePrice);
+        formData.append("discount", state.discount);
         formData.append("description", state.description);
         formData.append("short_description", state.shortDescription);
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post(
-                "http://127.0.0.1:8000/admin/Bepocart-product/",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `${token}`,
-                    },
-                }
-            );
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `${token}`,
+                },
+            });
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
-            console.log("Success", response.data);
-            // Clear form state after success
             setState({
                 name: "",
                 file: null,
+                slug: "",
                 category: "",
+                discount: "",
+                salePrice: "",
                 price: "",
                 description: "",
+                offerBanner: "",
                 shortDescription: "",
+                offerType: "",
+                offerStartDate: "",
+                offerEndDate: "",
             });
         } catch (error) {
             setMessage("Failed to submit the form.");
@@ -118,104 +208,133 @@ const FbDefaultForm = () => {
                 <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
                     <Box flexGrow={1}>
                         <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
-                            Product Form
+                            Offer Product Form
                         </Typography>
                     </Box>
                 </Box>
                 <Divider />
                 <CardContent sx={{ padding: "30px" }}>
                     <form onSubmit={handleSubmit}>
-                        <TextField
-                            name="name"
-                            label="Name"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.name}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="slug"
-                            label="Slug"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.slug}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="image"
-                            type="file"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            onChange={(e) => setState({ ...state, file: e.target.files[0] })}
-                        />
-                        {/* <TextField
-                            name="stock"
-                            label="Stock"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.stock}
-                            onChange={handleChange}
-                        /> */}
-                        <TextField
-                            select
-                            name="category"
-                            label="Category"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.category}
-                            onChange={handleChange}
-                        >
-                            {categories.map((category) => (
-                                <MenuItem key={category.id} value={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            name="price"
-                            label="Price"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={state.price}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="description"
-                            label="Description"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                            rows={4}
-                            sx={{ mb: 2 }}
-                            value={state.description}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            name="shortDescription"
-                            label="Short Description"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                            rows={2}
-                            sx={{ mb: 2 }}
-                            value={state.shortDescription}
-                            onChange={handleChange}
-                        />
-
-                        <Button type="submit" color="primary" variant="contained">
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="name"
+                                    label="Name"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.name}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="image"
+                                    type="file"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="slug"
+                                    label="Slug"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.slug}
+                                    onChange={handleChange}
+                                    error={!!slugError}
+                                    helperText={slugError}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select
+                                        name="category"
+                                        value={state.category}
+                                        onChange={handleChange}
+                                        label="Category"
+                                    >
+                                        {categories.map((category) => (
+                                            <MenuItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="price"
+                                    label="Price"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.price}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="salePrice"
+                                    label="Sale Price"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.salePrice}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="discount"
+                                    label="Discount"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    value={state.discount}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="description"
+                                    label="Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    sx={{ mb: 2 }}
+                                    value={state.description}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="shortDescription"
+                                    label="Short Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    sx={{ mb: 2 }}
+                                    value={state.shortDescription}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>
                             Submit
                         </Button>
                     </form>
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 };
 
 export default FbDefaultForm;

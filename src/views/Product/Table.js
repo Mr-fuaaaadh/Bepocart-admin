@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
+import "./ProductImageCell.css";
 import {
     Typography,
     Box,
@@ -128,7 +129,7 @@ const TableBanner = ({ searchQuery }) => {
                             <TableCell>Name</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Price</TableCell>
-                            {/* <TableCell>Stock</TableCell> */}
+                            <TableCell>Sale Price</TableCell>
                             <TableCell>Category</TableCell>
                             <TableCell>Variation</TableCell>
                             <TableCell>Delete</TableCell>
@@ -157,13 +158,35 @@ const TableBanner = ({ searchQuery }) => {
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        <img
-                                            src={`http://127.0.0.1:8000/${product.image}`}
-                                            alt={product.name}
-                                            style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                        />
-                                    </Link>
+                                    <div className="image-container">
+                                        <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image}`}
+                                                alt={product.name}
+                                                className="product-image"
+                                            />
+                                            {product.discount && (
+                                                <div className="discount-label">
+                                                    {Math.round(product.discount)}% OFF
+                                                </div>
+                                            )}
+                                        </Link>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Typography
+                                            variant="h6"
+                                            noWrap
+                                            sx={{
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {product.price}
+                                        </Typography>
+                                    </Box>
                                 </TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
@@ -180,22 +203,7 @@ const TableBanner = ({ searchQuery }) => {
                                         </Typography>
                                     </Box>
                                 </TableCell>
-                                {/* <TableCell>
-                                    <Box sx={{ maxWidth: "150px" }}>
-                                        <Typography
-                                            variant="h6"
-                                            noWrap
-                                            sx={{
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                                whiteSpace: "nowrap",
-                                                color: product.stock === 0 ? 'red' : 'green'
-                                            }}
-                                        >
-                                            {product.stock === 0 ? 'Stock Out' : 'Stock In'}
-                                        </Typography>
-                                    </Box>
-                                </TableCell> */}
+
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography
