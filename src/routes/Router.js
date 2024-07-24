@@ -72,6 +72,8 @@ const ReviewTable = lazy(() => import("../views/Review/ReviewTable.js"));
 const CustomerCoinTable = lazy(() => import("../views/Bcoin/CustomerTable.js"));
 
 const BogoForm = lazy(() => import("../views/Bogo/Form.js"));
+const BogoTable = lazy(() => import("../views/Bogo/BogoTable.js"));
+
 
 
 
@@ -161,6 +163,8 @@ const ThemeRoutes = [
 
 
       { path: "Bepocart-Bogo/", element: <BogoForm /> },
+      { path: "Bepocart-Bogo-table/", element: <BogoTable /> },
+
 
 
 

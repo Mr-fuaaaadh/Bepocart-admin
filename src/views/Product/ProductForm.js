@@ -27,9 +27,7 @@ const FbDefaultForm = () => {
         salePrice: "",
         price: "",
         description: "",
-        offerBanner: "",
         shortDescription: "",
-        offerType: "",
         offerStartDate: "",
         offerEndDate: "",
     });
@@ -42,7 +40,6 @@ const FbDefaultForm = () => {
         { value: "DISCOUNT SALE", label: "DISCOUNT SALE" },
     ];
 
-    const [offerBanners, setOfferBanners] = useState([]);
     const [categories, setCategories] = useState([]);
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
@@ -50,21 +47,6 @@ const FbDefaultForm = () => {
     const [slugError, setSlugError] = useState("");
 
     useEffect(() => {
-        const fetchOfferBanners = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/", {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
-                });
-                setOfferBanners(response.data.data);
-            } catch (error) {
-                console.error("Error fetching offer banners", error);
-            }
-        };
-        fetchOfferBanners();
-
         const fetchCategories = async () => {
             try {
                 const token = localStorage.getItem("token");
@@ -267,7 +249,7 @@ const FbDefaultForm = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                                 <TextField
                                     name="price"
                                     label="Price"
@@ -278,7 +260,7 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                                 <TextField
                                     name="salePrice"
                                     label="Sale Price"
@@ -289,7 +271,7 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                                 <TextField
                                     name="discount"
                                     label="Discount"

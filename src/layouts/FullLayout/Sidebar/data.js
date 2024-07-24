@@ -62,7 +62,7 @@ const Menuitems = [
   {
     title: "Bogo",
     icon: InventoryIcon,
-    href: "/Bepocart-bogo/",
+    href: "/Bepocart-Bogo-table/",
   },
 
   {
@@ -101,46 +101,46 @@ const Menuitems = [
     href: "/Bepocart-product-reviews/",
   },
 
-  {
-    title: "Autocomplete",
-    icon: AddToPhotosOutlinedIcon,
-    href: "/form-elements/autocomplete",
-  },
-  {
-    title: "Buttons",
-    icon: AspectRatioOutlinedIcon,
-    href: "/form-elements/button",
-  },
-  {
-    title: "Checkbox",
-    icon: AssignmentTurnedInOutlinedIcon,
-    href: "/form-elements/checkbox",
-  },
-  {
-    title: "Radio",
-    icon: AlbumOutlinedIcon,
-    href: "/form-elements/radio",
-  },
-  {
-    title: "Slider",
-    icon: SwitchCameraOutlinedIcon,
-    href: "/form-elements/slider",
-  },
-  {
-    title: "Switch",
-    icon: SwitchLeftOutlinedIcon,
-    href: "/form-elements/switch",
-  },
-  {
-    title: "Form",
-    icon: DescriptionOutlinedIcon,
-    href: "/form-layouts/form-layouts",
-  },
-  {
-    title: "Table",
-    icon: AutoAwesomeMosaicOutlinedIcon,
-    href: "/tables/basic-table",
-  },
+  // {
+  //   title: "Autocomplete",
+  //   icon: AddToPhotosOutlinedIcon,
+  //   href: "/form-elements/autocomplete",
+  // },
+  // {
+  //   title: "Buttons",
+  //   icon: AspectRatioOutlinedIcon,
+  //   href: "/form-elements/button",
+  // },
+  // {
+  //   title: "Checkbox",
+  //   icon: AssignmentTurnedInOutlinedIcon,
+  //   href: "/form-elements/checkbox",
+  // },
+  // {
+  //   title: "Radio",
+  //   icon: AlbumOutlinedIcon,
+  //   href: "/form-elements/radio",
+  // },
+  // {
+  //   title: "Slider",
+  //   icon: SwitchCameraOutlinedIcon,
+  //   href: "/form-elements/slider",
+  // },
+  // {
+  //   title: "Switch",
+  //   icon: SwitchLeftOutlinedIcon,
+  //   href: "/form-elements/switch",
+  // },
+  // {
+  //   title: "Form",
+  //   icon: DescriptionOutlinedIcon,
+  //   href: "/form-layouts/form-layouts",
+  // },
+  // {
+  //   title: "Table",
+  //   icon: AutoAwesomeMosaicOutlinedIcon,
+  //   href: "/tables/basic-table",
+  // },
 ];
 
 export default Menuitems;

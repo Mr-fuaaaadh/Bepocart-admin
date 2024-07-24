@@ -9,38 +9,20 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Chip,
+    Container,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
-    const [deleteProductId, setDeleteProductId] = useState(null);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [editProductId, setEditProductId] = useState(null);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [editedProductName, setEditedProductName] = useState("");
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [discountPrice, setDiscountPrice] = useState(0);
-    const [couponCodeCharge, setCouponCodeCharge] = useState(0);
+    const [order, setOrder] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-
-    const { id } = useParams(); // id is received as a string
+    const { id } = useParams();
 
     useEffect(() => {
-        // Convert id to a number
         const productId = parseInt(id);
-
-        fetchProducts(productId); // Pass id to fetchProducts function
+        fetchProducts(productId);
     }, [id]);
 
     const fetchProducts = async (productId) => {
@@ -54,6 +36,7 @@ const TableBanner = () => {
 
             if (Array.isArray(response.data.data)) {
                 setProducts(response.data.data);
+                setOrder(response.data.order);
             } else {
                 console.error("Invalid data format:", response.data);
                 setError("Invalid data format received");
@@ -66,158 +49,93 @@ const TableBanner = () => {
         }
     };
 
-    const handleDeleteConfirmation = (id) => {
-        setDeleteProductId(id);
-        setDeleteDialogOpen(true);
-    };
-
-    const handleDelete = async () => {
-        try {
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`);
-            setProducts(products.filter(product => product.id !== deleteProductId));
-            setDeleteDialogOpen(false);
-        } catch (error) {
-            console.error("Error deleting product:", error);
+    const truncateText = (text, maxLength) => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
         }
+        return text;
     };
 
-    const handleCancelDelete = () => {
-        setDeleteProductId(null);
-        setDeleteDialogOpen(false);
+    const TotalPrice = () => {
+        const productTotal = products.reduce((total, product) => total + (product.price * product.quantity), 0);
+        return productTotal.toFixed(2);
     };
 
-    const handleUpdate = (id, name) => {
-        setEditProductId(id);
-        setEditedProductName(name);
-        setEditDialogOpen(true);
-    };
+    const ProductOriginalPrice = () =>{
+        const productTotal = products.reduce((total, product) => total + (product.salePrice * product.quantity), 0);
+        return productTotal.toFixed(2);
+    }
 
-    const handleEditDialogClose = () => {
-        setEditProductId(null);
-        setEditDialogOpen(false);
-    };
+    if (loading) {
+        return <Typography>Loading...</Typography>;
+    }
 
-    const handleSaveEdit = async () => {
-        try {
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, {
-                name: editedProductName,
-                // Add other fields you want to update
-            });
-            // Update product locally
-            const updatedProducts = products.map(product =>
-                product.id === editProductId ? { ...product, name: editedProductName } : product
-            );
-            setProducts(updatedProducts);
-            setEditDialogOpen(false);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
-    const calculateTotalAmount = () => {
-        let total = 0;
-        products.forEach(product => {
-            total += product.quantity * product.salePrice;
-        });
-        setTotalAmount(total);
-    };
-    
-    const calculateDiscountPrice = () => {
-        let discount = 0;
-        products.forEach(product => {
-            if (product.offer_type === 'discount') {
-                discount += product.quantity * product.salePrice;
-            }
-        });
-        setDiscountPrice(discount);
-    };
-    
-    const calculateCouponCodeCharge = () => {
-    };
-    useEffect(() => {
-        calculateTotalAmount();
-        calculateDiscountPrice();
-        calculateCouponCodeCharge();
-    }, [products]);
-    
-    
+    if (error) {
+        return <Typography>Error: {error}</Typography>;
+    }
 
     return (
-        <>
+        <Container>
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Images</TableCell>
-                        <TableCell>Quantity</TableCell>
+                        <TableCell>UID</TableCell>
+                        <TableCell>Product</TableCell>
                         <TableCell>Price</TableCell>
-                        <TableCell>Total</TableCell>
-                        <TableCell>Offer Type</TableCell>
-                        <TableCell>Size</TableCell>
-                        <TableCell>color</TableCell>
-                        {/* <TableCell>Update</TableCell> */}
+                        <TableCell>Quantity</TableCell>
+                        <TableCell>Total Quantity</TableCell>
+                        <TableCell>Amount</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {products.map((product) => (
                         <TableRow key={product.id}>
-                            <TableCell>{product.id}</TableCell>
+                            <TableCell>#{product.id}</TableCell>
                             <TableCell>
-                                <Box sx={{ maxWidth: "150px" }}>
-                                    <Typography variant="h6" noWrap>
-                                        {product.productName}
+                                <Box display="flex" alignItems="center">
+                                    <img
+                                        src={`http://127.0.0.1:8000/${product.productImage}`}
+                                        alt={product.productName}
+                                        style={{ maxWidth: "50px", maxHeight: "50px", marginRight: "10px" }}
+                                    />
+                                    <Typography
+                                        style={{
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                            maxWidth: "150px",
+                                        }}
+                                    >
+                                        {truncateText(product.productName, 20)}
                                     </Typography>
                                 </Box>
                             </TableCell>
-                            <TableCell>
-
-                                <img
-                                    src={`http://127.0.0.1:8000/${product.productImage}`}
-                                    alt={product.name}
-                                    style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                />
-
-                            </TableCell>
-
-
+                            <TableCell>₹{product.salePrice} /-</TableCell>
                             <TableCell>{product.quantity}</TableCell>
-
-                            <TableCell>{product.salePrice}</TableCell>
-
-                            <TableCell>{product.quantity * product.salePrice}</TableCell>
-
-                            <TableCell>
-                                <Chip
-                                    sx={{
-                                        backgroundColor: product.offer_type ? 'warning.main' : 'inherit',
-                                        pl: '4px',
-                                        pr: '4px',
-                                    }}
-                                    size="small"
-                                    label={product.offer_type || 'No offer'}
-                                />
-                            </TableCell>
-
-
-                            <TableCell>{product.size}</TableCell>
-
-                            <TableCell>{product.color}</TableCell>
-
+                            <TableCell>{product.free_quantity + product.quantity}</TableCell>
+                            <TableCell>₹{product.quantity * product.salePrice} /-</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
 
-            <Box mt={7} >
-                <Typography variant="subtitle1">Total Amount: ${totalAmount}</Typography>
-                <Typography variant="subtitle1">Discount Price: ${discountPrice}</Typography>
-                <Typography variant="subtitle1">Coupon Code Charge: ${couponCodeCharge}</Typography>
+            <Box mt={7} display="flex" justifyContent="flex-end">
+                <Box mr={4}>
+                    <Typography variant="subtitle1">Subtotal :</Typography>
+                    <Typography variant="subtitle1">Discount :</Typography>
+                    <Typography variant="subtitle1">Shipping :</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold">Total :</Typography>
+                    <Typography variant="subtitle1">Status :</Typography>
+                </Box>
+                <Box>
+                    <Typography variant="subtitle1">₹{TotalPrice()} /-</Typography>
+                    <Typography variant="subtitle1">₹{TotalPrice() - ProductOriginalPrice()} /-</Typography>
+                    <Typography variant="subtitle1">₹{order.shipping} /-</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold">₹{order.total_amount} /-</Typography>
+                    <Typography variant="subtitle1" color="secondary">{order.status}</Typography>
+                </Box>
             </Box>
-
-
-
-        </>
-
+        </Container>
     );
 };
 

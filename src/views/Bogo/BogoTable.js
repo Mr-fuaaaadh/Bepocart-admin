@@ -3,31 +3,31 @@ import { Link as RouterLink } from "react-router-dom"; // Import Link from react
 
 import { Card, CardContent, Box, Typography, Button } from "@mui/material";
 
-import ExTable from "./Table.js";
+import BlogTable from "./Table.js";
 
-const SizeTable = () => {
+const BannerTable = () => {
   return (
-    < Box position="relative">
+    <Box position="relative">
       <Card variant="outlined">
         <CardContent>
-          <Typography variant="h3">Size Table</Typography>
+          <Typography variant="h3">BOGO Table</Typography>
           {/* Add Banner Table Component */}
           <Box
             sx={{
-              overflow: {
-                xs: "auto",
-                sm: "unset",
-              },
+              overflowX: "auto",  // Allow horizontal scrolling
+              overflowY: "hidden", // Prevent vertical scrolling
+              whiteSpace: "nowrap", // Prevent wrapping of table content
+              maxWidth: "100%", // Ensure it fits within the container
             }}
           >
-            <ExTable />
+            <BlogTable />
           </Box>
         </CardContent>
       </Card>
       {/* Add Banner Button Positioned at Top-Left */}
       <Button
         component={RouterLink}
-        to="/size-form/"
+        to="/Bepocart-bogo/"
         variant="contained"
         color="success"
         sx={{
@@ -38,10 +38,10 @@ const SizeTable = () => {
           ml: 125,
         }}
       >
-        Add Size
+        Add Blog
       </Button>
     </Box>
   );
 };
 
-export default SizeTable;
+export default BannerTable;
