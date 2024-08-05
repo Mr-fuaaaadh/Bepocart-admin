@@ -16,6 +16,7 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
+    FormHelperText,
 } from "@mui/material";
 
 const FbDefaultForm = () => {
@@ -31,12 +32,15 @@ const FbDefaultForm = () => {
         price: "",
         description: "",
         shortDescription: "",
+        type: "",
     });
 
     const [categories, setCategories] = useState([]);
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [imagePreview, setImagePreview] = useState(null); // Add state for image preview
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -73,7 +77,13 @@ const FbDefaultForm = () => {
                     discount: productData.discount,
                     description: productData.description,
                     shortDescription: productData.short_description,
+                    type: productData.type,
                 });
+
+                // Set image preview if an image is already associated with the product
+                if (productData.image) {
+                    setImagePreview(productData.image);
+                }
             } catch (error) {
                 console.error("Error fetching product details", error);
             }
@@ -88,14 +98,45 @@ const FbDefaultForm = () => {
     const calculateDiscount = (price, salePrice) => {
         const priceFloat = parseFloat(price);
         const salePriceFloat = parseFloat(salePrice);
-    
+
         if (!isNaN(priceFloat) && !isNaN(salePriceFloat) && priceFloat > 0) {
             const discount = ((priceFloat - salePriceFloat) / priceFloat) * 100;
-            return discount.toFixed(2); // returns discount as a percentage with 2 decimal places
+            return discount.toFixed(2);
         }
         return "";
     };
-    
+
+    const validateForm = () => {
+        let formErrors = {};
+
+        if (!state.name) {
+            formErrors.name = "Name is required";
+        }
+        if (!state.slug) {
+            formErrors.slug = "Slug is required";
+        }
+        if (!state.category) {
+            formErrors.category = "Category is required";
+        }
+        if (!state.price) {
+            formErrors.price = "Price is required";
+        }
+        if (!state.salePrice) {
+            formErrors.salePrice = "Sale price is required";
+        }
+        if (!state.description) {
+            formErrors.description = "Description is required";
+        }
+        if (!state.shortDescription) {
+            formErrors.shortDescription = "Short description is required";
+        }
+        if (!state.type) {
+            formErrors.type = "Type is required";
+        }
+
+        return formErrors;
+    };
+
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
@@ -125,11 +166,30 @@ const FbDefaultForm = () => {
             return;
         }
 
+        if (name === "file" && files) {
+            const file = files[0];
+            newState = {
+                ...newState,
+                file,
+            };
+
+            // Create a preview URL for the selected image
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+        }
+
         setState(newState);
+        setErrors({ ...errors, [name]: "" });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const formErrors = validateForm();
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
+            return;
+        }
 
         try {
             const formData = new FormData();
@@ -144,6 +204,7 @@ const FbDefaultForm = () => {
             formData.append("discount", state.discount);
             formData.append("description", state.description);
             formData.append("short_description", state.shortDescription);
+            formData.append("type", state.type);
 
             const token = localStorage.getItem("token");
             let response;
@@ -174,28 +235,31 @@ const FbDefaultForm = () => {
                 price: "",
                 description: "",
                 shortDescription: "",
+                type: "",
             });
+            setErrors({});
+            setImagePreview(null); // Reset image preview
         } catch (error) {
             handleApiError("Failed to submit the form.", error);
         }
     };
 
     const handleApiError = (message, error) => {
-        setSeverity("error");
+        console.error(message, error);
         setMessage(message);
-        setOpen(true);
-        console.error("API Error:", error.response ? error.response.data : error.message);
-    };
-
-    const handleValidationMessage = (message) => {
         setSeverity("error");
-        setMessage(message);
         setOpen(true);
     };
 
     const handleSuccessMessage = (message) => {
-        setSeverity("success");
         setMessage(message);
+        setSeverity("success");
+        setOpen(true);
+    };
+
+    const handleValidationMessage = (message) => {
+        setMessage(message);
+        setSeverity("warning");
         setOpen(true);
     };
 
@@ -211,16 +275,12 @@ const FbDefaultForm = () => {
                 </Alert>
             </Snackbar>
 
-            <Card variant="outlined" sx={{ p: 0 }}>
-                <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
-                    <Box flexGrow={1}>
-                        <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
-                            Offer Product Form
-                        </Typography>
-                    </Box>
-                </Box>
-                <Divider />
-                <CardContent sx={{ padding: "30px" }}>
+            <Card>
+                <CardContent>
+                    <Typography variant="h5" component="div" gutterBottom>
+                        {id ? "Edit Product" : "Add Product"}
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
                     <form onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
@@ -232,17 +292,40 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.name}
                                     onChange={handleChange}
+                                    error={!!errors.name}
+                                    helperText={errors.name}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    name="image"
+
+                            <Grid item xs={6}>
+                                <input
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    id="contained-button-file"
+                                    multiple
                                     type="file"
-                                    variant="outlined"
-                                    fullWidth
-                                    sx={{ mb: 2 }}
-                                    onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                                    name="file" // Change to "file" to match state
+                                    onChange={handleChange}
                                 />
+                                <label htmlFor="contained-button-file">
+                                    <Button variant="contained" color="primary" component="span">
+                                        Upload Image
+                                    </Button>
+                                </label>
+                                {imagePreview && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            style={{ maxWidth: "20%", height: "auto" }}
+                                        />
+                                    </Box>
+                                )}
+                                {errors.file && (
+                                    <Typography variant="body2" color="error">
+                                        {errors.file}
+                                    </Typography>
+                                )}
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -253,10 +336,12 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.slug}
                                     onChange={handleChange}
+                                    error={!!errors.slug}
+                                    helperText={errors.slug}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }} error={!!errors.category}>
                                     <InputLabel>Category</InputLabel>
                                     <Select
                                         name="category"
@@ -270,6 +355,7 @@ const FbDefaultForm = () => {
                                             </MenuItem>
                                         ))}
                                     </Select>
+                                    <FormHelperText>{errors.category}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -281,8 +367,11 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.price}
                                     onChange={handleChange}
+                                    error={!!errors.price}
+                                    helperText={errors.price}
                                 />
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     name="salePrice"
@@ -292,6 +381,8 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.salePrice}
                                     onChange={handleChange}
+                                    error={!!errors.salePrice}
+                                    helperText={errors.salePrice}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -303,7 +394,24 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.discount}
                                     onChange={handleChange}
+                                    error={!!errors.discount}
+                                    helperText={errors.discount}
                                 />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }} error={!!errors.type}>
+                                    <InputLabel>Type</InputLabel>
+                                    <Select
+                                        name="type"
+                                        value={state.type}
+                                        onChange={handleChange}
+                                        label="Type"
+                                    >
+                                        <MenuItem value="single">Single Product</MenuItem>
+                                        <MenuItem value="variant">Variant Product</MenuItem>
+                                    </Select>
+                                    <FormHelperText>{errors.type}</FormHelperText>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
@@ -316,6 +424,8 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.description}
                                     onChange={handleChange}
+                                    error={!!errors.description}
+                                    helperText={errors.description}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -329,6 +439,8 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.shortDescription}
                                     onChange={handleChange}
+                                    error={!!errors.shortDescription}
+                                    helperText={errors.shortDescription}
                                 />
                             </Grid>
                         </Grid>

@@ -101,7 +101,7 @@ const CategoryTable = () => {
     const handleSaveEdit = async () => {
         try {
             await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-varient-update/${editProductId}/`, {
-                name: editedProductName,
+                size: editedProductName,
                 stock: editedProductStock,
                 // Add other fields you want to update
             });
@@ -201,7 +201,7 @@ const CategoryTable = () => {
                 <DialogTitle>Edit Product</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Product Name"
+                        label="Product Size"
                         value={editedProductName}
                         onChange={(e) => setEditedProductName(e.target.value)}
                         fullWidth

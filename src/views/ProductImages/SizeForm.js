@@ -1,41 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const SizeForm = ({ open, onClose, onSizeAdded, productId }) => {
+const SizeForm = ({ open, onClose, onSizeAdded,productTYPE,productId}) => {
     const [size, setSize] = useState("");
     const [quantity, setQuantity] = useState("");
     const { id } = useParams();  // Access the id parameter from the URL
 
+    // Clear the form inputs when the dialog opens
+    useEffect(() => {
+        if (open) {
+            setSize("");
+            setQuantity("");
+        }
+    }, [open]);
 
-
-
-    console.log("Product Id     :",id)
+    console.log("Product Id from useParams                          :", productId);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
 
-        if (!productId) {
+        // Ensure productId is valid
+        if (!id) {
             console.error("Error: Product ID not found");
             return;
         }
 
         try {
+            console.log("Sending data:", { size, stock: quantity, product: parseInt(id) });
             const response = await axios.post(`http://127.0.0.1:8000/admin/Bepocart-product-varient/${productId}/`, {
                 size,
                 stock: quantity,
-                product: parseInt(id)
+                product: parseInt(id),
+                "productType" : productTYPE
             }, {
                 headers: {
-                    'Authorization': `Token ${token}`,
+                    'Authorization': `${token}`,
                 },
             });
+
+            console.log("Response data:", response.data);
             onSizeAdded(response.data);
             onClose();
         } catch (error) {
             console.error("Error adding size:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+            }
         }
     };
 

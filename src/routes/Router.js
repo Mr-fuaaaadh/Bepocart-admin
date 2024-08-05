@@ -45,6 +45,8 @@ const SizeForm = lazy(() => import("../views/size/Form.js"));
 const SizeTable = lazy(() => import("../views/size/SizeTable.js"));
 
 const ProductImageForm = lazy(() => import("../views/ProductImages/Form.js"));
+const ProductImageUpdateForm = lazy(() => import("../views/ProductImages/UpdateForm.js"));
+
 const ProductImagesTable = lazy(() =>
   import("../views/ProductImages/ProductImageTable.js")
 );
@@ -132,6 +134,8 @@ const ThemeRoutes = [
 
       { path: "product-image-table/:id", element: <ProductImagesTable /> },
       { path: "product-image-form/:id", element: <ProductImageForm /> },
+      { path: "product-image-update/:id", element: <ProductImageUpdateForm /> },
+
 
 
 

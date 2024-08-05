@@ -16,6 +16,8 @@ import {
     FormControl,
     OutlinedInput,
     Chip,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 
 const FbDefaultForm = () => {
@@ -34,6 +36,7 @@ const FbDefaultForm = () => {
     });
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -54,7 +57,6 @@ const FbDefaultForm = () => {
             const couponData = response.data.data;
             console.log("Coupon Data:", couponData);
     
-            // Ensure couponData exists and has necessary fields
             if (couponData) {
                 setFormData({
                     code: couponData.code || "",
@@ -65,21 +67,16 @@ const FbDefaultForm = () => {
                     status: couponData.status || "Active",
                     max_uses: couponData.max_uses || "",
                     used_count: couponData.used_count || 0,
-                    discount_product: couponData.discount_product ? couponData.discount_product.map(p => p.id) : [],
-                    discount_category: couponData.discount_category ? couponData.discount_category.map(c => c.id) : [],
+                    discount_product: couponData.discount_product || [],
+                    discount_category: couponData.discount_category || [],
                 });
             } else {
                 console.error("Empty or undefined coupon data received.");
-                // Handle empty or undefined data scenario
             }
         } catch (error) {
             console.error("Error fetching coupon details:", error);
-            // Handle error
         }
     };
-    
-    
-    
 
     const fetchProducts = async () => {
         try {
@@ -92,7 +89,6 @@ const FbDefaultForm = () => {
             setProducts(response.data.data);
         } catch (error) {
             console.error("Error fetching products:", error);
-            // Handle error
         }
     };
 
@@ -107,7 +103,6 @@ const FbDefaultForm = () => {
             setCategories(response.data.data);
         } catch (error) {
             console.error("Error fetching categories:", error);
-            // Handle error
         }
     };
 
@@ -131,21 +126,27 @@ const FbDefaultForm = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
+            console.log("Submitting form data:", formData);  // Add this log to see the form data
             await axios.put(`http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-update/${id}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
             console.log('Coupon updated successfully:', formData);
+            setOpenSnackbar(true);  // Open Snackbar on success
         } catch (error) {
             console.error("Error updating coupon:", error);
-            // Show error message
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+            }
         }
-        console.log("Product   :",formData.discount_product);
-        console.log("Categry    :",formData.discount_category);
-
+        console.log("Product:", formData.discount_product);
+        console.log("Category:", formData.discount_category);
     };
-    
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
 
     return (
         <div>
@@ -280,14 +281,15 @@ const FbDefaultForm = () => {
                                     <Select
                                         labelId="discount-product-label"
                                         id="discount_product"
+                                        name="discount_product"
                                         multiple
                                         value={formData.discount_product}
                                         onChange={(e) => handleMultipleChange(e, "discount_product")}
-                                        input={<OutlinedInput label="Discount Product" />}
+                                        input={<OutlinedInput id="select-multiple-chip" label="Discount Product" />}
                                         renderValue={(selected) => (
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                                 {selected.map((value) => (
-                                                    <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
+                                                    <Chip key={value} label={products.find((product) => product.id === value)?.name} />
                                                 ))}
                                             </Box>
                                         )}
@@ -306,14 +308,15 @@ const FbDefaultForm = () => {
                                     <Select
                                         labelId="discount-category-label"
                                         id="discount_category"
+                                        name="discount_category"
                                         multiple
                                         value={formData.discount_category}
                                         onChange={(e) => handleMultipleChange(e, "discount_category")}
-                                        input={<OutlinedInput label="Discount Category" />}
+                                        input={<OutlinedInput id="select-multiple-chip" label="Discount Category" />}
                                         renderValue={(selected) => (
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                                 {selected.map((value) => (
-                                                    <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
+                                                    <Chip key={value} label={categories.find((category) => category.id === value)?.name} />
                                                 ))}
                                             </Box>
                                         )}
@@ -327,7 +330,7 @@ const FbDefaultForm = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <Button variant="contained" color="primary" type="submit" fullWidth>
+                                <Button type="submit" variant="contained" color="primary">
                                     Update Coupon
                                 </Button>
                             </Grid>
@@ -335,6 +338,11 @@ const FbDefaultForm = () => {
                     </form>
                 </CardContent>
             </Card>
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                    Coupon updated successfully!
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

@@ -17,6 +17,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SizeForm from "./SizeForm";
+import EditIcon from "@mui/icons-material/Edit";
+
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
@@ -24,20 +26,40 @@ const TableBanner = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [sizeDialogOpen, setSizeDialogOpen] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedProductType, setSelectedProductType] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const token = localStorage.getItem('token');
+    const [productType, setProductType] = useState("single");
+
     useEffect(() => {
         const productId = parseInt(id);
         fetchProducts(productId);
     }, [id]);
+    console.log("token  :",token)
+
+    useEffect(() => {
+        const fetchData = async (productId) => {
+            try {
+                const featuresResponse = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${productId}/`, {
+                    headers: {
+                        'Authorization': `${token}`,
+                    }
+                });
+                setProductType(featuresResponse.data.data.type);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData(parseInt(id));
+    }, [id, token]);
 
     const fetchProducts = async (productId) => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
@@ -63,23 +85,34 @@ const TableBanner = () => {
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
+        // setSelectedProductType(productType);
         setDeleteDialogOpen(true);
     };
 
     const handleDelete = async () => {
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
-                headers: {
-                    'Authorization': `${token}`,
+            data: {
+                    productType: productType
                 },
-            });
+            headers: {
+                'Authorization': `${token}`,
+            },
+        });
             setProducts(products.filter(product => product.id !== deleteProductId));
             setDeleteDialogOpen(false);
         } catch (error) {
             console.error("Error deleting product:", error);
         }
     };
+    
+    const handleUpdateClick = (id) => {
+        setSelectedProductType(productType);
+        navigate(`/product-image-update/${id}/?type=${productType}`);
+    };
+    
+    
+    
 
     const handleCancelDelete = () => {
         setDeleteProductId(null);
@@ -88,6 +121,7 @@ const TableBanner = () => {
 
     const handleAddSize = (productId) => {
         setSelectedProductId(productId);
+        setSelectedProductType(productType);
         setSizeDialogOpen(true);
     };
 
@@ -116,14 +150,17 @@ const TableBanner = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Image 1</TableCell>
-                            <TableCell>Image 2</TableCell>
-                            <TableCell>Image 3</TableCell>
-                            <TableCell>Image 4</TableCell>
-                            <TableCell>Image 5</TableCell>
-                            <TableCell>Size</TableCell>
-                            <TableCell>Delete</TableCell>
+                            <TableCell>NAME</TableCell>
+                            <TableCell>IMAGE 1</TableCell>
+                            <TableCell>IMAGE 2</TableCell>
+                            <TableCell>IMAGE 3</TableCell>
+                            <TableCell>IMAGE 4</TableCell>
+                            <TableCell>IMAGE 5</TableCell>
+                            {productType === "single" && <TableCell>STOCK</TableCell>}
+                            {productType !== "single" && <TableCell>SIZE</TableCell>}
+                            <TableCell>DELETE</TableCell>
+                            <TableCell>UPDATE</TableCell>
+
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -131,84 +168,148 @@ const TableBanner = () => {
                             <TableRow key={product.id}>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-
+                                    {productType === "single" ? (
                                         <Box sx={{ maxWidth: "150px" }}>
                                             <Typography variant="h6" noWrap>
                                                 {product.color}
                                             </Typography>
                                         </Box>
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Box sx={{ maxWidth: "150px" }}>
+                                                <Typography variant="h6" noWrap>
+                                                    {product.color}
+                                                </Typography>
+                                            </Box>
+                                        </Link>
+                                    )}
                                 </TableCell>
                                 <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
-
+                                    {productType === "single" ? (
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image1}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image1}`}
+                                                alt={product.name}
+                                                style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                            />
+                                        </Link>
+                                    )}
                                 </TableCell>
-                                <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
 
+                                <TableCell>
+                                    {productType === "single" ? (
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image2}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image2}`}
+                                                alt={product.name}
+                                                style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                            />
+                                        </Link>
+                                    )}
                                 </TableCell>
-                                <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
 
+                                <TableCell>
+                                    {productType === "single" ? (
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image3}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image3}`}
+                                                alt={product.name}
+                                                style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                            />
+                                        </Link>
+                                    )}
                                 </TableCell>
-                                <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
 
+                                <TableCell>
+                                    {productType === "single" ? (
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image4}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image4}`}
+                                                alt={product.name}
+                                                style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                            />
+                                        </Link>
+                                    )}
                                 </TableCell>
-                                <TableCell>
-                                    <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
 
+                                <TableCell>
+                                    {productType === "single" ? (
                                         <img
                                             src={`http://127.0.0.1:8000/${product.image5}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
-                                    </Link>
+                                    ) : (
+                                        <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/${product.image5}`}
+                                                alt={product.name}
+                                                style={{ maxWidth: "70px", maxHeight: "70px" }}
+                                            />
+                                        </Link>
+                                    )}
                                 </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => handleAddSize(product.id)}
-                                    >
-                                        Add Size
-                                    </Button>
-                                </TableCell>
+
+
+                                {productType === "single" ? (
+                                    <TableCell>{product.stock}</TableCell>
+                                ) : (
+                                    <TableCell>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleAddSize(product.id,productType)}
+                                            disabled={productType === "single"}
+                                        >
+                                            Add Size
+                                        </Button>
+                                    </TableCell>
+                                )}
                                 <TableCell>
                                     <Button
                                         variant="contained"
                                         color="error"
-                                        onClick={() => handleDeleteConfirmation(product.id)}
+                                        onClick={() => handleDeleteConfirmation(product.id,productType)}
                                         startIcon={<DeleteIcon />}
                                     >
                                         Delete
                                     </Button>
                                 </TableCell>
+
+                                <TableCell>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<EditIcon />}
+                                        onClick={() => handleUpdateClick(product.id,productType)}
+                                    >
+                                        Update
+                                    </Button>
+                                </TableCell>
+
                             </TableRow>
                         ))}
                     </TableBody>
@@ -235,6 +336,7 @@ const TableBanner = () => {
                 onClose={() => setSizeDialogOpen(false)}
                 productId={selectedProductId}
                 onSizeAdded={handleSizeAdded}
+                productTYPE={selectedProductType}
             />
         </>
     );

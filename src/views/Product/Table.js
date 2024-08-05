@@ -161,7 +161,7 @@ const TableBanner = ({ searchQuery }) => {
                                     <div className="image-container">
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:8000/${product.image}`}
+                                                src={`http://127.0.0.1:8000${product.image}`}
                                                 alt={product.name}
                                                 className="product-image"
                                             />

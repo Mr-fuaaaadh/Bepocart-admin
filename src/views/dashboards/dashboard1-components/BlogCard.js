@@ -1,43 +1,80 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Card, CardContent, Typography, Button, Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import user1 from "../../../assets/images/backgrounds/u2.jpg";
-import user2 from "../../../assets/images/backgrounds/u3.jpg";
-import user3 from "../../../assets/images/backgrounds/u4.jpg";
+const Blogs = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-const blogs = [
-  {
-    img: user1,
-    title: "Super awesome, Angular 12 is coming soon!",
-    subtitle:
-      "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    btncolor: "error",
-  },
-  {
-    img: user2,
-    title: "Super awesome, Angular 12 is coming soon!",
-    subtitle:
-      "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    btncolor: "warning",
-  },
-  {
-    img: user3,
-    title: "Super awesome, Angular 12 is coming soon!",
-    subtitle:
-      "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    btncolor: "primary",
-  },
-];
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-const BlogCard = () => {
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Blogs/", {
+        headers: {
+          'Authorization': `${token}`,
+        },
+      });
+
+      if (Array.isArray(response.data.data)) {
+        setProducts(response.data.data);
+      } else {
+        setError("Invalid data format received");
+      }
+    } catch (error) {
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        navigate('/login');
+      } else {
+        setError("Error fetching banners");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  return <BlogCard products={products} />;
+};
+
+const BlogCard = ({ products }) => {
+  const [expanded, setExpanded] = useState({});
+
+  const toggleExpand = (index) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const getPreviewContent = (content) => {
+    const words = content.split(" ");
+    return words.length > 50 ? words.slice(0, 50).join(" ") + "..." : content;
+  };
+
   return (
-    <Grid container>
-      {blogs.map((blog, index) => (
+    <Grid container spacing={2}>
+      {products.map((product, index) => (
         <Grid
           key={index}
           item
           xs={12}
-          lg={4}
+          sm={6}
+          md={4}
           sx={{
             display: "flex",
             alignItems: "stretch",
@@ -46,15 +83,19 @@ const BlogCard = () => {
           <Card
             variant="outlined"
             sx={{
-              p: 0,
               width: "100%",
+              height: "400px", // Fixed height for uniform card size
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <img src={blog.img} alt="img" width="100%" />
+            <img src={`http://127.0.0.1:8000${product.image}`} alt="img" width="100%" style={{ height: '200px', objectFit: 'cover' }} />
             <CardContent
               sx={{
                 paddingLeft: "30px",
                 paddingRight: "30px",
+                flexGrow: 1,
+                overflow: "auto", // Make content scrollable if it exceeds the card height
               }}
             >
               <Typography
@@ -63,7 +104,7 @@ const BlogCard = () => {
                   fontWeight: "500",
                 }}
               >
-                {blog.title}
+                {product.title}
               </Typography>
               <Typography
                 color="textSecondary"
@@ -73,16 +114,17 @@ const BlogCard = () => {
                   mt: 1,
                 }}
               >
-                {blog.subtitle}
+                {expanded[index] ? product.content : getPreviewContent(product.content)}
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   mt: "15px",
                 }}
-                color={blog.btncolor}
+                color="primary"
+                onClick={() => toggleExpand(index)}
               >
-                Learn More
+                {expanded[index] ? "Show Less" : "Learn More"}
               </Button>
             </CardContent>
           </Card>
@@ -92,4 +134,4 @@ const BlogCard = () => {
   );
 };
 
-export default BlogCard;
+export default Blogs;

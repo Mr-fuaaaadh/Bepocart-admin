@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -25,34 +25,51 @@ const FbDefaultForm = () => {
     });
 
     const { id } = useParams();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const productType = queryParams.get('type');
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
-    const [features, setFeatures] = useState([]);
     const [errors, setErrors] = useState({
         color: "",
         images: "",
     });
-    const [productType, setProductType] = useState("single"); 
     const token = localStorage.getItem('token');
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch features
-                const featuresResponse = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
-                    headers: {
-                        'Authorization': `${token}`,
-                    }
-                });
-                setFeatures(featuresResponse.data);
-                setProductType(featuresResponse.data.data.type);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+        const fetchProductData = async () => {
+            if (id && productType) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, {
+                        params: {
+                            productType: productType
+                        },
+                        headers: {
+                            'Authorization': `${token}`,
+                        },
+                    });
+                    const product = response.data;
+                    setState({
+                        image1: product.image1,
+                        image2: product.image2,
+                        image3: product.image3,
+                        image4: product.image4,
+                        image5: product.image5,
+                        color: product.color,
+                        stock: productType === "single" ? product.stock : "",
+                    });
+                } catch (error) {
+                    setMessage("Failed to fetch product data.");
+                    setSeverity("error");
+                    setOpen(true);
+                }
             }
         };
-        fetchData();
-    }, [id, token]);
+
+        fetchProductData();
+    }, [id, productType, token]);
+
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -90,6 +107,7 @@ const FbDefaultForm = () => {
 
         const formData = new FormData();
         formData.append("color", state.color);
+        formData.append("productType", productType);
         if (productType === "single") {
             formData.append("stock", state.stock);
         }
@@ -100,7 +118,7 @@ const FbDefaultForm = () => {
         formData.append("image5", state.image5);
 
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/admin/Bepocart-Product-image-add/${id}/`, formData, {
+            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,
@@ -109,7 +127,6 @@ const FbDefaultForm = () => {
             setMessage("Form submitted successfully!");
             setSeverity("success");
             setOpen(true);
-            console.log("Success", response.data);
             setState({
                 image1: null,
                 image2: null,
@@ -123,7 +140,6 @@ const FbDefaultForm = () => {
             setMessage("Failed to submit the form.");
             setSeverity("error");
             setOpen(true);
-            console.error("Error", error.response ? error.response.data : error.message);
         }
     };
 

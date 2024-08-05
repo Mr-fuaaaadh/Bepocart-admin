@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 const FbDefaultForm = () => {
-    const [state, setState] = useState({ quantity: "", value: "", login_value: "", payment_value: "" });
+    const [state, setState] = useState({ coin: "", value: "", login_value: "", payment_value: "", first_payment_value: "",referral_point:"",review_reward:"",birthday_reward:"",anniversary_reward:""});
     const [open, setOpen] = useState(false);
     const [severity, setSeverity] = useState("success");
     const [message, setMessage] = useState("");
@@ -63,12 +63,13 @@ const FbDefaultForm = () => {
                 <CardContent sx={{ padding: "30px" }}>
                     <form onSubmit={handleSubmit}>
                         <TextField
-                            name="quantity"
+                            name="coin"
                             label="Quantity"
+                            type="number"
                             variant="outlined"
                             fullWidth
                             sx={{ mb: 2 }}
-                            value={state.quantity}
+                            value={state.coin}
                             onChange={handleChange}
                         />
                         <TextField
@@ -98,6 +99,58 @@ const FbDefaultForm = () => {
                             fullWidth
                             sx={{ mb: 2 }}
                             value={state.payment_value}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="first_payment_value"
+                            label=" First Payment Value"
+                            type="number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.first_payment_value}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="referral_point"
+                            label=" Reffral Point"
+                            type="number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.referral_point}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="review_reward"
+                            label=" Review Reward"
+                            type="number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.review_reward}
+                            onChange={handleChange}
+                        />
+
+                        <TextField
+                            name="birthday_reward"
+                            label="Birthday Reward"
+                            type="number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.birthday_reward}
+                            onChange={handleChange}
+                        />
+
+                        <TextField
+                            name="anniversary_reward"
+                            label="Anniversey Reward"
+                            type="number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.anniversary_reward}
                             onChange={handleChange}
                         />
                         <Grid container spacing={0} sx={{ mb: 2 }}>
