@@ -57,7 +57,7 @@ const Invoice = () => {
     useEffect(() => {
         const fetchOrderData = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Bill/${order_id}/`);
+                const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-Order-Bill/${order_id}/`);
                 setOrderData(response.data);
             } catch (error) {
                 console.error('Error fetching order data:', error);
@@ -200,7 +200,7 @@ const Invoice = () => {
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
                                             {/* <TableCell>
-                                            <img src={`http://127.0.0.1:8000${item.productImage}`} alt={item.productName} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                            <img src={`http://127.0.0.1:9000${item.productImage}`} alt={item.productName} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
                                         </TableCell> */}
                                             <TableCell>{item.productName}</TableCell>
                                             <TableCell>{item.quantity}</TableCell>

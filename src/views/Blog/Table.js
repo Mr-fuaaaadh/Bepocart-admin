@@ -36,7 +36,7 @@ const BlogTable = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Blogs/", {
+            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-Blogs/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -66,7 +66,7 @@ const BlogTable = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Blog-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-Blog-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -140,7 +140,7 @@ const BlogTable = () => {
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={`http://127.0.0.1:8000/${product.image}`}
+                                        src={`http://127.0.0.1:9000/${product.image}`}
                                         alt={product.name}
                                         style={{ maxWidth: "70px", maxHeight: "70px" }}
                                     />

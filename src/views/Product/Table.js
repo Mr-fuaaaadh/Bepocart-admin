@@ -52,7 +52,7 @@ const TableBanner = ({ searchQuery }) => {
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
+            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-products/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -90,7 +90,7 @@ const TableBanner = ({ searchQuery }) => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-product-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -161,7 +161,7 @@ const TableBanner = ({ searchQuery }) => {
                                     <div className="image-container">
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:8000${product.image}`}
+                                                src={`http://127.0.0.1:9000${product.image}`}
                                                 alt={product.name}
                                                 className="product-image"
                                             />

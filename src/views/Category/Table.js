@@ -41,7 +41,7 @@ const CategoryTable = () => {
         try {
             const token = localStorage.getItem('token');
             console.log("token", token);
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/", {
+            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-categories/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -79,7 +79,7 @@ const CategoryTable = () => {
                 return;
             }
     
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-category-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -118,7 +118,7 @@ const CategoryTable = () => {
             }
 
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, formData, {
+            await axios.put(`http://127.0.0.1:9000/admin/Bepocart-category-update/${editProductId}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -171,7 +171,7 @@ const CategoryTable = () => {
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={`http://127.0.0.1:8000/${product.image}`}
+                                        src={`http://127.0.0.1:9000/${product.image}`}
                                         alt={product.name}
                                         style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />

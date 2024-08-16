@@ -30,7 +30,7 @@ const SizeForm = ({ open, onClose, onSizeAdded,productTYPE,productId}) => {
 
         try {
             console.log("Sending data:", { size, stock: quantity, product: parseInt(id) });
-            const response = await axios.post(`http://127.0.0.1:8000/admin/Bepocart-product-varient/${productId}/`, {
+            const response = await axios.post(`http://127.0.0.1:9000/admin/Bepocart-product-varient/${productId}/`, {
                 size,
                 stock: quantity,
                 product: parseInt(id),

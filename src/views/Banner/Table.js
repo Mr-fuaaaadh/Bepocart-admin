@@ -41,7 +41,7 @@ const TableBanner = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/", {
+            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-Banners/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -73,7 +73,7 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${deleteProductId}/`, {
+            const response = await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-Banner-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -112,7 +112,7 @@ const TableBanner = () => {
                 formData.append("image", editedProductImage);
             }
 
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
+            await axios.put(`http://127.0.0.1:9000/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -168,7 +168,7 @@ const TableBanner = () => {
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={`http://127.0.0.1:8000/${product.image}`}
+                                        src={`http://127.0.0.1:9000/${product.image}`}
                                         alt={product.name}
                                         style={{ maxWidth: "70px", maxHeight: "70px" }}
                                     />

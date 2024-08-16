@@ -22,6 +22,7 @@ const FbDefaultForm = () => {
         image5: null,
         color: "",
         stock: "",
+        product: 0,
     });
 
     const { id } = useParams();
@@ -41,25 +42,25 @@ const FbDefaultForm = () => {
         const fetchProductData = async () => {
             if (id && productType) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, {
-                        params: {
-                            productType: productType
-                        },
+                    const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-Product-images-update/${id}/`, {
+                        params: { productType },
                         headers: {
                             'Authorization': `${token}`,
                         },
                     });
-                    const product = response.data;
+                    const product = response.data.data;
                     setState({
-                        image1: product.image1,
-                        image2: product.image2,
-                        image3: product.image3,
-                        image4: product.image4,
-                        image5: product.image5,
-                        color: product.color,
+                        image1: product.image1 || null,
+                        image2: product.image2 || null,
+                        image3: product.image3 || null,
+                        image4: product.image4 || null,
+                        image5: product.image5 || null,
+                        color: product.color || "",
                         stock: productType === "single" ? product.stock : "",
+                        product: product.product || 0,
                     });
                 } catch (error) {
+                    console.error('Error fetching product data:', error);
                     setMessage("Failed to fetch product data.");
                     setSeverity("error");
                     setOpen(true);
@@ -69,7 +70,6 @@ const FbDefaultForm = () => {
 
         fetchProductData();
     }, [id, productType, token]);
-
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -82,17 +82,14 @@ const FbDefaultForm = () => {
     const validateForm = () => {
         const errors = {};
 
-        // Validate color
         if (!state.color.trim()) {
             errors.color = "Color is required.";
         }
 
-        // Validate images
         if (!state.image1 && !state.image2 && !state.image3 && !state.image4 && !state.image5) {
             errors.images = "At least one image is required.";
         }
 
-        // Validate stock if product type is single
         if (productType === "single" && (!Number.isInteger(Number(state.stock)) || Number(state.stock) <= 0)) {
             errors.stock = "Stock must be a positive integer.";
         }
@@ -108,17 +105,21 @@ const FbDefaultForm = () => {
         const formData = new FormData();
         formData.append("color", state.color);
         formData.append("productType", productType);
+        formData.append("product", state.product.toString());
+
         if (productType === "single") {
             formData.append("stock", state.stock);
         }
-        formData.append("image1", state.image1);
-        formData.append("image2", state.image2);
-        formData.append("image3", state.image3);
-        formData.append("image4", state.image4);
-        formData.append("image5", state.image5);
+
+        for (let i = 1; i <= 5; i++) {
+            const file = state[`image${i}`];
+            if (file instanceof Blob) {
+                formData.append(`image${i}`, file, file.name);
+            }
+        }
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, formData, {
+            await axios.put(`http://127.0.0.1:9000/admin/Bepocart-Product-images-update/${id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,
@@ -135,8 +136,10 @@ const FbDefaultForm = () => {
                 image5: null,
                 color: "",
                 stock: "",
+                product: 0,
             });
         } catch (error) {
+            console.error('Error submitting form:', error);
             setMessage("Failed to submit the form.");
             setSeverity("error");
             setOpen(true);
@@ -148,7 +151,8 @@ const FbDefaultForm = () => {
     };
 
     const createImagePreviewUrl = (file) => {
-        return file ? URL.createObjectURL(file) : null;
+        if (!file) return null;
+        return typeof file === "string" ? file : URL.createObjectURL(file);
     };
 
     return (
@@ -169,7 +173,7 @@ const FbDefaultForm = () => {
                 </Box>
                 <Divider />
                 <CardContent sx={{ padding: "30px" }}>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} encType="multipart/form-data">
                         <TextField
                             name="color"
                             label="Name / Color / Teeth"
@@ -205,6 +209,7 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                     error={!!errors.images}
                                     helperText={i === 1 ? errors.images : ""}
+                                    inputProps={{ accept: "image/*" }}
                                 />
                                 {state[`image${i}`] && (
                                     <Box sx={{ mb: 2 }}>
@@ -219,7 +224,7 @@ const FbDefaultForm = () => {
                             </div>
                         ))}
                         
-                        <Button type="submit" color="primary" variant="contained" >
+                        <Button type="submit" color="primary" variant="contained">
                             Submit
                         </Button>
                     </form>
