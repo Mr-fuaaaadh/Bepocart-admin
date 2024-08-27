@@ -18,7 +18,7 @@ const Blogs = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-Blogs/", {
+      const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Blogs/", {
         headers: {
           'Authorization': `${token}`,
         },
@@ -89,7 +89,7 @@ const BlogCard = ({ products }) => {
               flexDirection: "column",
             }}
           >
-            <img src={`http://127.0.0.1:9000${product.image}`} alt="img" width="100%" style={{ height: '200px', objectFit: 'cover' }} />
+            <img src={`${product.image}`} alt="img" width="100%" style={{ height: '200px', objectFit: 'cover' }} />
             <CardContent
               sx={{
                 paddingLeft: "30px",

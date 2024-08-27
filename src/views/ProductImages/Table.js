@@ -44,7 +44,7 @@ const TableBanner = () => {
     useEffect(() => {
         const fetchData = async (productId) => {
             try {
-                const featuresResponse = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-product-update/${productId}/`, {
+                const featuresResponse = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${productId}/`, {
                     headers: {
                         'Authorization': `${token}`,
                     }
@@ -60,7 +60,7 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-Product-images/${productId}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -91,7 +91,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
             data: {
                     productType: productType
                 },
@@ -187,14 +187,14 @@ const TableBanner = () => {
                                 <TableCell>
                                     {productType === "single" ? (
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image1}`}
+                                            src={`${product.image1}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
                                     ) : (
                                         <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000/${product.image1}`}
+                                                src={`${product.image1}`}
                                                 alt={product.name}
                                                 style={{ maxWidth: "70px", maxHeight: "70px" }}
                                             />
@@ -205,14 +205,14 @@ const TableBanner = () => {
                                 <TableCell>
                                     {productType === "single" ? (
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image2}`}
+                                            src={`${product.image2}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
                                     ) : (
                                         <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000/${product.image2}`}
+                                                src={`${product.image2}`}
                                                 alt={product.name}
                                                 style={{ maxWidth: "70px", maxHeight: "70px" }}
                                             />
@@ -223,14 +223,14 @@ const TableBanner = () => {
                                 <TableCell>
                                     {productType === "single" ? (
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image3}`}
+                                            src={`${product.image3}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
                                     ) : (
                                         <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000/${product.image3}`}
+                                                src={`${product.image3}`}
                                                 alt={product.name}
                                                 style={{ maxWidth: "70px", maxHeight: "70px" }}
                                             />
@@ -241,14 +241,14 @@ const TableBanner = () => {
                                 <TableCell>
                                     {productType === "single" ? (
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image4}`}
+                                            src={`${product.image4}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
                                     ) : (
                                         <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000/${product.image4}`}
+                                                src={`${product.image4}`}
                                                 alt={product.name}
                                                 style={{ maxWidth: "70px", maxHeight: "70px" }}
                                             />
@@ -259,14 +259,14 @@ const TableBanner = () => {
                                 <TableCell>
                                     {productType === "single" ? (
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image5}`}
+                                            src={`${product.image5}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />
                                     ) : (
                                         <Link to={`/size-table/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000/${product.image5}`}
+                                                src={`${product.image5}`}
                                                 alt={product.name}
                                                 style={{ maxWidth: "70px", maxHeight: "70px" }}
                                             />

@@ -16,6 +16,10 @@ import {
 const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
+        meta_title: "",
+        meta_description: "",
+        meta_keyword: "",
+        alt_text: "",
         file: null,
     });
 
@@ -35,13 +39,17 @@ const FbDefaultForm = () => {
         e.preventDefault();
         const formData = new FormData();
         formData.append("name", state.name);
+        formData.append("meta_title", state.meta_title);
+        formData.append("meta_description", state.meta_description);
+        formData.append("meta_keyword", state.meta_keyword);
+        formData.append("alt_text", state.alt_text);
         if (state.file) {
             formData.append("image", state.file);
         }
     
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post("http://127.0.0.1:9000/admin/Bepocart-Banner/", formData, {
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Banner/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,
@@ -53,6 +61,10 @@ const FbDefaultForm = () => {
             setOpen(true);
             setState({
                 name: "",
+                meta_title: "",
+                meta_description: "",
+                meta_keyword: "",
+                alt_text: "",
                 file: null,
             });
         } catch (error) {
@@ -74,8 +86,6 @@ const FbDefaultForm = () => {
         }
     };
     
-    
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -106,6 +116,42 @@ const FbDefaultForm = () => {
                             fullWidth
                             sx={{ mb: 2 }}
                             value={state.name}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="meta_title"
+                            label="Meta Title"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.meta_title}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="meta_description"
+                            label="Meta Description"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.meta_description}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="meta_keyword"
+                            label="Meta Keyword"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.meta_keyword}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            name="alt_text"
+                            label="Alt Text"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={state.alt_text}
                             onChange={handleChange}
                         />
                         <TextField

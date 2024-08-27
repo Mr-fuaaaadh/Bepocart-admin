@@ -42,7 +42,7 @@ const FbDefaultForm = () => {
         const fetchProductData = async () => {
             if (id && productType) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-Product-images-update/${id}/`, {
+                    const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, {
                         params: { productType },
                         headers: {
                             'Authorization': `${token}`,
@@ -119,7 +119,7 @@ const FbDefaultForm = () => {
         }
 
         try {
-            await axios.put(`http://127.0.0.1:9000/admin/Bepocart-Product-images-update/${id}/`, formData, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Product-images-update/${id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,

@@ -33,7 +33,7 @@ const CategoryTable = () => {
     const [editedProductName, setEditedProductName] = useState("");
     const [editedProductImage, setEditedProductImage] = useState(null);
     const [editedMainCategory, setEditedMainCategory] = useState("");
-    const [editedSlug, setEditedSlug] = useState(""); // Added state for edited slug
+    const [editedSlug, setEditedSlug] = useState("");
     const [mainCategories, setMainCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -47,7 +47,7 @@ const CategoryTable = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-subcategories/", {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-subcategories/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -67,7 +67,7 @@ const CategoryTable = () => {
     const fetchMainCategories = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-categories/", {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-categories/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -95,7 +95,7 @@ const CategoryTable = () => {
                 return;
             }
 
-            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-subcategory-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-subcategory-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -116,7 +116,7 @@ const CategoryTable = () => {
     const handleUpdate = (id, name, slug, mainCategory) => {
         setEditProductId(id);
         setEditedProductName(name);
-        setEditedSlug(slug); // Set slug in the update state
+        setEditedSlug(slug);
         setEditedMainCategory(mainCategory);
         setEditDialogOpen(true);
     };
@@ -130,14 +130,14 @@ const CategoryTable = () => {
         try {
             const formData = new FormData();
             formData.append("name", editedProductName);
-            formData.append("slug", editedSlug); // Include slug in form data
+            formData.append("slug", editedSlug);
             if (editedProductImage) {
                 formData.append("image", editedProductImage);
             }
             formData.append("category", editedMainCategory);
 
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:9000/admin/Bepocart-subcategory-update/${editProductId}/`, formData, {
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-subcategory-update/${editProductId}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -173,7 +173,7 @@ const CategoryTable = () => {
                         <TableRow>
                             <TableCell>Id</TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell>Slug</TableCell> {/* Added column for slug */}
+                            <TableCell>Slug</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Delete</TableCell>
                             <TableCell>Update</TableCell>
@@ -210,10 +210,10 @@ const CategoryTable = () => {
                                         </Box>
                                     </Box>
                                 </TableCell>
-                                <TableCell>{product.slug}</TableCell> {/* Display slug */}
+                                <TableCell>{product.slug}</TableCell>
                                 <TableCell>
                                     <img
-                                        src={`http://127.0.0.1:9000/${product.image}`}
+                                        src={product.image}
                                         alt={product.name}
                                         style={{ maxWidth: "50px", maxHeight: "50px" }}
                                     />
@@ -265,7 +265,7 @@ const CategoryTable = () => {
                         fullWidth
                         variant="outlined"
                         margin="normal"
-                    /> {/* Added input field for slug */}
+                    />
                     <FormControl fullWidth variant="outlined" margin="normal">
                         <InputLabel>Main Category</InputLabel>
                         <Select
@@ -273,11 +273,15 @@ const CategoryTable = () => {
                             onChange={(e) => setEditedMainCategory(e.target.value)}
                             label="Main Category"
                         >
-                            {mainCategories.map((category) => (
-                                <MenuItem key={category.id} value={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
+                            {mainCategories.length > 0 ? (
+                                mainCategories.map((category) => (
+                                    <MenuItem key={category.id} value={category.id}>
+                                        {category.name}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem value="" disabled>No categories available</MenuItem>
+                            )}
                         </Select>
                     </FormControl>
                     <Box mt={2}>

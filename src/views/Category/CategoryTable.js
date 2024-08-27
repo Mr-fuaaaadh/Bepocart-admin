@@ -1,5 +1,5 @@
 import React from "react";
-import { Link as RouterLink } from "react-router-dom"; 
+import { Link as RouterLink } from "react-router-dom";
 
 import { Card, CardContent, Box, Typography, Button } from "@mui/material";
 
@@ -7,38 +7,34 @@ import ExTable from "./Table.js";
 
 const CategoryTable = () => {
   return (
-    <Box position="relative">
-      <Card variant="outlined">
-        <CardContent>
-          <Typography variant="h3">Category Table</Typography>
-          <Box
-            sx={{
-              overflow: {
-                xs: "auto",
-                sm: "unset",
-              },
-            }}
-          >
-            <ExTable />
-          </Box>
-        </CardContent>
-      </Card>
-      <Button
-        component={RouterLink}
-        to="/category-form/"
-        variant="contained"
-        color="success"
+    <CardContent>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h3">Category Table</Typography>
+
+
+        <Button
+          component={RouterLink}
+          to="/category-form/"
+
+
+          variant="contained"
+          color="success"
+        >
+          Add Category
+
+        </Button>
+      </Box>
+      <Box
         sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          mt: 2,
-          ml: 125,
+          overflow: {
+            xs: "auto",
+            sm: "unset",
+          },
         }}
       >
-        Add Category
-      </Button>
-    </Box>
+        <ExTable />
+      </Box>
+    </CardContent>
   );
 };
 

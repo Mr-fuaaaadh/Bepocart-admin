@@ -33,7 +33,7 @@ const TableBanner = () => {
         setError(null); 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-customers/", {
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-customers/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -79,9 +79,9 @@ const TableBanner = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product) => (
+                        {products.map((product,index) => (
                             <TableRow key={product.id}>
-                                <TableCell>{product.id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Link to={`/user-coin-data/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -94,7 +94,7 @@ const TableBanner = () => {
                                 <TableCell>
                                     <Link to={`/user-coin-data/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <img
-                                            src={`http://127.0.0.1:9000/${product.image}`}
+                                            src={`${product.image}`}
                                             alt={product.name}
                                             style={{ maxWidth: "70px", maxHeight: "70px" }}
                                         />

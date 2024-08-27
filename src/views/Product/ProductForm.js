@@ -23,6 +23,7 @@ const FbDefaultForm = () => {
         file: null,
         slug: "",
         category: "",
+        type: "single", // Default to "single"
         discount: "",
         salePrice: "",
         price: "",
@@ -32,15 +33,8 @@ const FbDefaultForm = () => {
         offerEndDate: "",
     });
 
-    const OfferTypes = [
-        { value: "50%", label: "50%" },
-        { value: "BUY 1 GET 1", label: "BUY 1 GET 1" },
-        { value: "FLASH SALE", label: "FLASH SALE" },
-        { value: "BUY 2 GET 1", label: "BUY 2 GET 1" },
-        { value: "DISCOUNT SALE", label: "DISCOUNT SALE" },
-    ];
-
     const [categories, setCategories] = useState([]);
+    const [preview, setPreview] = useState(null);
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
@@ -50,7 +44,7 @@ const FbDefaultForm = () => {
         const fetchCategories = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-subcategories/", {
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -76,14 +70,14 @@ const FbDefaultForm = () => {
     const calculateDiscount = (price, salePrice) => {
         const priceFloat = parseFloat(price);
         const salePriceFloat = parseFloat(salePrice);
-    
+
         if (!isNaN(priceFloat) && !isNaN(salePriceFloat) && priceFloat > 0) {
             const discount = ((priceFloat - salePriceFloat) / priceFloat) * 100;
-            return discount.toFixed(2); // returns discount as a percentage with 2 decimal places
+            return discount.toFixed(2);
         }
         return "";
     };
-    
+
     const handleChange = (e) => {
         const { name, value, files } = e.target;
         if (name === "slug") {
@@ -98,7 +92,13 @@ const FbDefaultForm = () => {
                 ...state,
                 [name]: files ? files[0] : value,
             };
-    
+
+            if (name === "file" && files.length > 0) {
+                const file = files[0];
+                setPreview(URL.createObjectURL(file));
+                newState.file = file;
+            }
+
             if (name === "price" || name === "salePrice") {
                 const discount = calculateDiscount(newState.price, newState.salePrice);
                 newState = {
@@ -112,11 +112,10 @@ const FbDefaultForm = () => {
                 setOpen(true);
                 return;
             }
-    
+
             setState(newState);
         }
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -134,6 +133,7 @@ const FbDefaultForm = () => {
         }
         formData.append("slug", state.slug);
         formData.append("category", state.category);
+        formData.append("type", state.type); // Append product type to form data
         formData.append("price", state.price);
         formData.append("salePrice", state.salePrice);
         formData.append("discount", state.discount);
@@ -142,7 +142,7 @@ const FbDefaultForm = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post("http://127.0.0.1:9000/admin/Bepocart-product/", formData, {
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `${token}`,
@@ -156,16 +156,14 @@ const FbDefaultForm = () => {
                 file: null,
                 slug: "",
                 category: "",
+                type: "single", // Reset to default
                 discount: "",
                 salePrice: "",
                 price: "",
                 description: "",
-                offerBanner: "",
                 shortDescription: "",
-                offerType: "",
-                offerStartDate: "",
-                offerEndDate: "",
             });
+            setPreview(null);
         } catch (error) {
             setMessage("Failed to submit the form.");
             setSeverity("error");
@@ -186,7 +184,6 @@ const FbDefaultForm = () => {
                 </Alert>
             </Snackbar>
 
-            <Card variant="outlined" sx={{ p: 0 }}>
                 <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
                     <Box flexGrow={1}>
                         <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
@@ -211,13 +208,23 @@ const FbDefaultForm = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    name="image"
+                                    name="file"
                                     type="file"
                                     variant="outlined"
                                     fullWidth
                                     sx={{ mb: 2 }}
-                                    onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                                    onChange={handleChange}
                                 />
+                                {preview && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="body2">Image Preview:</Typography>
+                                        <img
+                                            src={preview}
+                                            alt="Preview"
+                                            style={{ maxWidth: "100px", maxHeight: "100px", borderRadius: "4px" }}
+                                        />
+                                    </Box>
+                                )}
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -249,7 +256,7 @@ const FbDefaultForm = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={6}>
                                 <TextField
                                     name="price"
                                     label="Price"
@@ -260,7 +267,7 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={6}>
                                 <TextField
                                     name="salePrice"
                                     label="Sale Price"
@@ -271,7 +278,7 @@ const FbDefaultForm = () => {
                                     onChange={handleChange}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={6}>
                                 <TextField
                                     name="discount"
                                     label="Discount"
@@ -280,7 +287,22 @@ const FbDefaultForm = () => {
                                     sx={{ mb: 2 }}
                                     value={state.discount}
                                     onChange={handleChange}
+                                    disabled
                                 />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel>Product Type</InputLabel>
+                                    <Select
+                                        name="type"
+                                        value={state.type}
+                                        onChange={handleChange}
+                                        label="Product Type"
+                                    >
+                                        <MenuItem value="single">Single</MenuItem>
+                                        <MenuItem value="variant">Variant</MenuItem>
+                                    </Select>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
@@ -314,7 +336,6 @@ const FbDefaultForm = () => {
                         </Button>
                     </form>
                 </CardContent>
-            </Card>
         </div>
     );
 };

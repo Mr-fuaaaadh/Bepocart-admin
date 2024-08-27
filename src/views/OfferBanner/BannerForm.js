@@ -8,43 +8,75 @@ import {
     Typography,
     TextField,
     Button,
-    Grid,
-    Alert,
     Snackbar,
+    Alert
 } from "@mui/material";
 
 const FbDefaultForm = () => {
     const [state, setState] = useState({
         name: "",
-        file: null,
+        file: null
     });
 
+    const [preview, setPreview] = useState(null); // State for image preview
     const [message, setMessage] = useState(null);
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
 
+    const [errors, setErrors] = useState({
+        name: ""
+    });
+
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setState({
-            ...state,
-            [name]: files ? files[0] : value,
-        });
+        if (name === "file" && files.length > 0) {
+            const file = files[0];
+            setState({
+                ...state,
+                [name]: file
+            });
+            setPreview(URL.createObjectURL(file)); // Set the image preview URL
+        } else {
+            setState({
+                ...state,
+                [name]: value
+            });
+        }
+    };
+
+    const validate = () => {
+        let isValid = true;
+        const errors = {};
+
+        if (!state.name) {
+            errors.name = "Name is required";
+            isValid = false;
+        }
+
+        // Remove image validation
+        setErrors(errors);
+        return isValid;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            return;
+        }
+
         const formData = new FormData();
         formData.append("name", state.name);
         if (state.file) {
             formData.append("image", state.file);
         }
-    
+
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post("http://127.0.0.1:9000/admin/Bepocart-Offer-Banner/", formData, {
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Offer-Banner/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `${token}`,
+                    'Authorization': `${token}`, // Ensure Bearer prefix is used
                 },
             });
             setMessage("Form submitted successfully!");
@@ -54,8 +86,9 @@ const FbDefaultForm = () => {
             // Clear form state after success
             setState({
                 name: "",
-                file: null,
+                file: null
             });
+            setPreview(null); // Clear preview after success
         } catch (error) {
             setMessage("Failed to submit the form.");
             setSeverity("error");
@@ -63,7 +96,7 @@ const FbDefaultForm = () => {
             console.error("Error", error.response ? error.response.data : error.message);
         }
     };
-    
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -80,7 +113,7 @@ const FbDefaultForm = () => {
                 <Box sx={{ padding: "15px 30px" }} display="flex" alignItems="center">
                     <Box flexGrow={1}>
                         <Typography sx={{ fontSize: "18px", fontWeight: "500" }}>
-                           Offer Banner Form
+                            Offer Banner Form
                         </Typography>
                     </Box>
                 </Box>
@@ -95,18 +128,29 @@ const FbDefaultForm = () => {
                             sx={{ mb: 2 }}
                             value={state.name}
                             onChange={handleChange}
+                            error={!!errors.name}
+                            helperText={errors.name}
                         />
                         <TextField
-                            name="image"
+                            name="file"
                             type="file"
                             variant="outlined"
                             fullWidth
                             sx={{ mb: 2 }}
-                            onChange={(e) => setState({ ...state, file: e.target.files[0] })}
+                            onChange={handleChange}
                         />
 
-                        <Grid container spacing={0} sx={{ mb: 2 }}>
-                        </Grid>
+                        {preview && (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="body2">Image Preview:</Typography>
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    style={{ maxWidth: "200px", maxHeight: "200px", borderRadius: "4px" }}
+                                />
+                            </Box>
+                        )}
+
                         <div>
                             <Button type="submit" color="primary" variant="contained">
                                 Submit

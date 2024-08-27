@@ -46,7 +46,7 @@ const FbDefaultForm = () => {
         const fetchCategories = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-subcategories/", {
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -60,7 +60,7 @@ const FbDefaultForm = () => {
         const fetchProductDetails = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-product-update/${id}/`, {
+                const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -209,14 +209,14 @@ const FbDefaultForm = () => {
             const token = localStorage.getItem("token");
             let response;
             if (id) {
-                response = await axios.put(`http://127.0.0.1:9000/admin/Bepocart-product-update/${id}/`, formData, {
+                response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         Authorization: `${token}`,
                     },
                 });
             } else {
-                response = await axios.post("http://127.0.0.1:9000/admin/Bepocart-product/", formData, {
+                response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         Authorization: `${token}`,

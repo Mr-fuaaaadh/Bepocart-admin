@@ -30,6 +30,8 @@ const FbDefaultForm = () => {
     const [severity, setSeverity] = useState("success");
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const token = localStorage.getItem('token');
+
 
     useEffect(() => {
         fetchMainCategories();
@@ -38,8 +40,7 @@ const FbDefaultForm = () => {
     const fetchMainCategories = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-main-categories/", {
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -56,7 +57,6 @@ const FbDefaultForm = () => {
             setLoading(false);
         }
     };
-    
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -65,7 +65,7 @@ const FbDefaultForm = () => {
             setState({
                 ...state,
                 mainCategory: value,
-                selectedCategoryImage: selectedCategory ? `http://127.0.0.1:9000/${selectedCategory.image}` : null,
+                selectedCategoryImage: selectedCategory ? `${selectedCategory.image}` : null,
             });
         } else {
             setState({
@@ -75,8 +75,32 @@ const FbDefaultForm = () => {
         }
     };
 
+    const validateForm = () => {
+        if (!state.name.trim()) {
+            setMessage("Name is required.");
+            setSeverity("error");
+            setOpen(true);
+            return false;
+        }
+        if (!state.slug.trim()) {
+            setMessage("Slug is required.");
+            setSeverity("error");
+            setOpen(true);
+            return false;
+        }
+        if (!state.mainCategory) {
+            setMessage("Main category is required.");
+            setSeverity("error");
+            setOpen(true);
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
+
         const formData = new FormData();
         formData.append("name", state.name);
         formData.append("slug", state.slug);
@@ -86,9 +110,11 @@ const FbDefaultForm = () => {
         }
 
         try {
-            const response = await axios.post("http://127.0.0.1:9000/admin/Bepocart-subcategory/", formData, {
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-subcategory/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `${token}`,
+
                 },
             });
             setMessage("Form submitted successfully!");
@@ -112,6 +138,15 @@ const FbDefaultForm = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setState({
+            ...state,
+            file,
+            filePreview: file ? URL.createObjectURL(file) : null,
+        });
     };
 
     return (
@@ -154,14 +189,6 @@ const FbDefaultForm = () => {
                                 value={state.slug}
                                 onChange={handleChange}
                             />
-                            <TextField
-                                name="image"
-                                type="file"
-                                variant="outlined"
-                                fullWidth
-                                sx={{ mb: 2 }}
-                                onChange={(e) => setState({ ...state, file: e.target.files[0] })}
-                            />
                             <FormControl fullWidth sx={{ mb: 2 }}>
                                 <InputLabel>Category</InputLabel>
                                 <Select
@@ -176,11 +203,19 @@ const FbDefaultForm = () => {
                                     ))}
                                 </Select>
                             </FormControl>
-                            {state.selectedCategoryImage && (
+                            <TextField
+                                name="image"
+                                type="file"
+                                variant="outlined"
+                                fullWidth
+                                sx={{ mb: 2 }}
+                                onChange={handleFileChange}
+                            />
+                            {state.filePreview && (
                                 <Box
                                     component="img"
-                                    src={state.selectedCategoryImage}
-                                    alt="Selected Category"
+                                    src={state.filePreview}
+                                    alt="Selected Preview"
                                     sx={{
                                         maxWidth: "100%",
                                         maxHeight: "200px",

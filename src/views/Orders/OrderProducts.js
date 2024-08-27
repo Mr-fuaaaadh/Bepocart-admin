@@ -28,7 +28,7 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://127.0.0.1:9000/admin/Bepocart-Order-Item/${productId}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -61,10 +61,17 @@ const TableBanner = () => {
         return productTotal.toFixed(2);
     };
 
-    const ProductOriginalPrice = () =>{
+    const ProductOriginalPrice = () => {
         const productTotal = products.reduce((total, product) => total + (product.salePrice * product.quantity), 0);
         return productTotal.toFixed(2);
-    }
+    };
+
+    const shippingCharge = parseFloat(order.total_amount) < 500 ? 60.00 : 0.00;
+
+    const TotalFreeQuantity = () => {
+        const totalFreeQuantity = products.reduce((total, product) => total + product.free_quantity, 0);
+        return totalFreeQuantity;
+    };
 
     if (loading) {
         return <Typography>Loading...</Typography>;
@@ -79,22 +86,22 @@ const TableBanner = () => {
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>UID</TableCell>
-                        <TableCell>Product</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell>Quantity</TableCell>
-                        <TableCell>Total Quantity</TableCell>
-                        <TableCell>Amount</TableCell>
+                        <TableCell>ID</TableCell>
+                        <TableCell>PRODUCT</TableCell>
+                        <TableCell>SIZE</TableCell>
+                        <TableCell>PRICE</TableCell>
+                        <TableCell>TOTAL QUANTITY</TableCell>
+                        <TableCell>AMOUNT</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {products.map((product) => (
+                    {products.map((product, index) => (
                         <TableRow key={product.id}>
-                            <TableCell>#{product.id}</TableCell>
+                            <TableCell>#{index + 1}</TableCell>
                             <TableCell>
                                 <Box display="flex" alignItems="center">
                                     <img
-                                        src={`http://127.0.0.1:9000/${product.productImage}`}
+                                        src={`${product.productImage}`}
                                         alt={product.productName}
                                         style={{ maxWidth: "50px", maxHeight: "50px", marginRight: "10px" }}
                                     />
@@ -104,20 +111,41 @@ const TableBanner = () => {
                                             textOverflow: "ellipsis",
                                             whiteSpace: "nowrap",
                                             maxWidth: "150px",
+                                            display: "flex",
+                                            flexDirection: "column"
                                         }}
                                     >
                                         {truncateText(product.productName, 20)}
+                                        <span style={{ marginTop: '4px', fontSize: '0.875rem', color: 'green' }}>{product.offer_type}</span>
                                     </Typography>
                                 </Box>
                             </TableCell>
-                            <TableCell>₹{product.salePrice} /-</TableCell>
+                            <TableCell>
+                                {product.size && product.color
+                                    ? `${product.size}, ${product.color}`
+                                    : product.size || product.color || 'N/A'}
+                            </TableCell>
+
+                            <TableCell>₹{product.price} /-</TableCell>
                             <TableCell>{product.quantity}</TableCell>
-                            <TableCell>{product.free_quantity + product.quantity}</TableCell>
-                            <TableCell>₹{product.quantity * product.salePrice} /-</TableCell>
+                            <TableCell>₹{product.quantity * product.price} /-</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
+
+            <Box
+                mt={2}
+                p={2}
+                border="1px dotted green"
+                borderRadius="4px"
+                bgcolor="#e8f5e9"
+                display="flex"
+                justifyContent="flex-start"
+            >
+                <Typography variant="subtitle1">Total Free Quantity : {order.free_quantity}</Typography>
+            </Box>
+
 
             <Box mt={7} display="flex" justifyContent="flex-end">
                 <Box mr={4}>
@@ -130,7 +158,7 @@ const TableBanner = () => {
                 <Box>
                     <Typography variant="subtitle1">₹{TotalPrice()} /-</Typography>
                     <Typography variant="subtitle1">₹{TotalPrice() - ProductOriginalPrice()} /-</Typography>
-                    <Typography variant="subtitle1">₹{order.shipping} /-</Typography>
+                    <Typography variant="subtitle1">${shippingCharge.toFixed(2)}/-</Typography>
                     <Typography variant="subtitle1" fontWeight="bold">₹{order.total_amount} /-</Typography>
                     <Typography variant="subtitle1" color="secondary">{order.status}</Typography>
                 </Box>

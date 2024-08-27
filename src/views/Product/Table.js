@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
-import "./ProductImageCell.css";
 import {
     Typography,
     Box,
@@ -16,23 +15,56 @@ import {
     DialogContent,
     DialogActions,
     CircularProgress,
+    TextField
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PermMediaIcon from '@mui/icons-material/PermMedia';
+import SearchIcon from '@mui/icons-material/Search';
+import "./ProductImageCell.css";
 
-const TableBanner = ({ searchQuery }) => {
+const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    const fetchProducts = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+
+            if (Array.isArray(response.data.data)) {
+                const sortedProducts = response.data.data.sort((a, b) => a.id - b.id);
+                setProducts(sortedProducts);
+                setFilteredProducts(sortedProducts);
+            } else {
+                console.error("Invalid data format:", response.data);
+                setError("Invalid data format");
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                navigate('/login');
+            } else {
+                setError("Error fetching products");
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [navigate]);
+
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [fetchProducts]);
 
     useEffect(() => {
         if (searchQuery) {
@@ -42,41 +74,12 @@ const TableBanner = ({ searchQuery }) => {
                     product =>
                         product.name.toLowerCase().includes(lowercasedQuery) ||
                         product.categoryName.toLowerCase().includes(lowercasedQuery)
-                )
+                ).sort((a, b) => a.id - b.id)
             );
         } else {
-            setFilteredProducts(products);
+            setFilteredProducts(products.sort((a, b) => a.id - b.id));
         }
     }, [searchQuery, products]);
-
-    const fetchProducts = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:9000/admin/Bepocart-products/", {
-                headers: {
-                    'Authorization': `${token}`,
-                },
-            });
-            console.log("Full response:", response);
-
-            if (Array.isArray(response.data.data)) {
-                setProducts(response.data.data);
-                setFilteredProducts(response.data.data);
-                console.log("Response data:", response.data.data);
-            } else {
-                console.error("Invalid data format:", response.data);
-            }
-        } catch (error) {
-            console.error("Error fetching products:", error);
-            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                navigate('/login');
-            } else {
-                setError("Error fetching banners");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleDeleteConfirmation = (id) => {
         setDeleteProductId(id);
@@ -90,12 +93,13 @@ const TableBanner = ({ searchQuery }) => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:9000/admin/Bepocart-product-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
             });
-            setProducts(products.filter(product => product.id !== deleteProductId));
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== deleteProductId).sort((a, b) => a.id - b.id));
+            setFilteredProducts(prevFilteredProducts => prevFilteredProducts.filter(product => product.id !== deleteProductId).sort((a, b) => a.id - b.id));
             setDeleteDialogOpen(false);
         } catch (error) {
             console.error("Error deleting product:", error);
@@ -109,6 +113,25 @@ const TableBanner = ({ searchQuery }) => {
 
     return (
         <>
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <TextField
+                    label="Search"
+                    placeholder="Search by product name or category"
+                    variant="outlined"
+                    size="small"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    sx={{ flex: 1 }}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<SearchIcon />}
+                >
+                    Search
+                </Button>
+            </Box>
+
             {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
                     <CircularProgress />
@@ -137,9 +160,9 @@ const TableBanner = ({ searchQuery }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredProducts.map((product) => (
+                        {filteredProducts.map((product, index) => (
                             <TableRow key={product.id}>
-                                <TableCell>{product.id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -161,7 +184,7 @@ const TableBanner = ({ searchQuery }) => {
                                     <div className="image-container">
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <img
-                                                src={`http://127.0.0.1:9000${product.image}`}
+                                                src={`${product.image}`}
                                                 alt={product.name}
                                                 className="product-image"
                                             />
@@ -203,7 +226,6 @@ const TableBanner = ({ searchQuery }) => {
                                         </Typography>
                                     </Box>
                                 </TableCell>
-
                                 <TableCell>
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography

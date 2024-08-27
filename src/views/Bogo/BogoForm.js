@@ -20,7 +20,6 @@ import {
     Checkbox,
     FormControlLabel,
 } from "@mui/material";
-import { format } from 'date-fns';
 
 const FbDefaultForm = () => {
     const [open, setOpen] = useState(false);
@@ -29,207 +28,167 @@ const FbDefaultForm = () => {
     const [formData, setFormData] = useState({
         name: "",
         offer_type: "BUY",
-        get_option: "",
+        get_option: null,
         amount: null,
-        get_value: "",
+        get_value: null, // Allowing get_value to be null
         method: "",
-        discount_percentage: "",
+        discount_percentage: null,
         offer_products: [],
         exclude_products: [],
         offer_category: [],
         excluded_offer_category: [],
-        start_date: "",
-        end_date: "",
+        start_date: null,
+        end_date: null,
         messages: "",
-        shipping_charge: "",
-        coupon_user_limit: "",
-        coupon_use_order_limit: "",
+        shipping_charge: null,
+        coupon_user_limit: null,
+        coupon_use_order_limit: null,
         discount_allowd_coupons: [],
-        is_active: "Allowd",
+        is_active: null,  // Use `null` for allowed state
         discount_approved_products: [],
         discount_not_allowd_products: [],
         discount_approved_category: [],
         discount_not_allowd_category: [],
-
-
-
-
     });
 
-
-    console.log("form Data     :", formData)
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [discount_products, setDiscountProducts] = useState([]);
     const [discount_category, setDiscountCategory] = useState([]);
     const [coupons, setCoupons] = useState([]);
-    const [percentageValue, setPercentageValue] = useState("");
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:9000/admin/Bepocart-products/", {
+        axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
         }).then((response) => {
             setProducts(response.data.data);
             setDiscountProducts(response.data.data);
-            console.log("Products   :", response.data.data)
-
         });
 
-        axios.get("http://127.0.0.1:9000/admin/Bepocart-subcategories/", {
+        axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
         }).then((response) => {
             setCategories(response.data.data);
-            setDiscountCategory(response.data.data)
-            console.log("Category   :", response.data.data)
-
+            setDiscountCategory(response.data.data);
         });
 
-        axios.get("http://127.0.0.1:9000/admin/Bepocart-promotion-coupen-views/", {
+        axios.get("http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-views/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
         }).then((response) => {
             setCoupons(response.data);
-            console.log("coupon   :", response.data)
         });
 
     }, []);
 
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Determine selected and unselected products
         let selectedProducts = [];
         let unselectedProducts = [];
-
         let selectedCategory = [];
         let unselectedCategory = [];
 
         if (formData.exclude_products.length > 0) {
-            // Save all unselected products if any products are excluded
             unselectedProducts = products
                 .filter(product => !formData.exclude_products.includes(product.id))
                 .map(product => product.id);
         } else {
-            // Save only selected products if no products are excluded
             selectedProducts = products
                 .filter(product => formData.offer_products.includes(product.id))
                 .map(product => product.id);
         }
 
         if (formData.excluded_offer_category.length > 0) {
-            // Save all unselected categories if any categories are excluded
-            unselectedCategory = categories  // Assuming `categories` is the list to filter from
+            unselectedCategory = categories
                 .filter(category => !formData.excluded_offer_category.includes(category.id))
                 .map(category => category.id);
         } else {
-            // Save only selected categories if no categories are excluded
-            selectedCategory = categories  // Assuming `categories` is the list to filter from
+            selectedCategory = categories
                 .filter(category => formData.offer_category.includes(category.id))
                 .map(category => category.id);
         }
 
-        // Update the payload based on conditions
         const payload = {
             ...formData,
             offer_products: formData.exclude_products.length > 0 ? unselectedProducts : selectedProducts,
             offer_category: formData.excluded_offer_category.length > 0 ? unselectedCategory : selectedCategory,
-
-            amount: formData.amount ? parseInt(formData.amount, 10) : null
+            amount: formData.amount ? parseInt(formData.amount, 10) : null,
+            get_value: formData.get_value === "" ? null : formData.get_value // Handle get_value as null
         };
 
-        // Now `payload` contains either all unselected products or selected products,
-        // depending on whether any products are excluded. Use `payload` for saving after form submission.
-
-
-        axios.post("http://127.0.0.1:9000/admin/Bepocart-offer/", payload, {
+        axios.post("http://127.0.0.1:8000/admin/Bepocart-offer/", payload, {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
         })
             .then(response => {
-                console.log("Offer created:", response.data);
                 setOpen(true);
                 setSeverity("success");
                 setMessage("Offer created successfully");
-                // Optionally, reset form data or handle success state
             })
             .catch(error => {
-                console.error("Error creating offer:", error);
                 setOpen(true);
                 setSeverity("error");
                 setMessage("Error creating offer. Please try again.");
-                // Optionally, handle error state or display error message
             });
     };
 
-
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevState) => ({
+        setFormData(prevState => ({
             ...prevState,
-            [name]: value,
+            [name]: value === "" ? null : value, // Handle empty string as null
         }));
 
         if (name === "method") {
             if (value === "FREE") {
-                setFormData((prevState) => ({
+                setFormData(prevState => ({
                     ...prevState,
-                    discount_percentage: "",
+                    discount_percentage: null,
                 }));
             } else if (value === "% OFF") {
-                setFormData((prevState) => ({
+                setFormData(prevState => ({
                     ...prevState,
-                    get_value: "",
+                    get_value: null,
                 }));
             }
         }
 
         if (name === "offer_type") {
             if (value === "BUY") {
-                setFormData((prevState) => ({
+                setFormData(prevState => ({
                     ...prevState,
-                    get_option: "",
+                    get_option: null,
                 }));
             } else if (value === "SPEND") {
-                setFormData((prevState) => ({
+                setFormData(prevState => ({
                     ...prevState,
-                    amount: "",
+                    amount: null,
                 }));
             }
         }
     };
+
     const handleCheckboxChange = (event) => {
-        setFormData({ ...formData, is_active: event.target.checked });
+        setFormData(prevState => ({
+            ...prevState,
+            is_active: event.target.checked
+        }));
     };
 
     const handleMultipleChange = (event, field) => {
         const { value } = event.target;
-        setFormData((prevState) => {
-            let updatedFormData = { ...prevState, [field]: value };
-
-            // if (field === "exclude_products") {
-            //     // Automatically set offer_products to all products that are not in exclude_products
-            //     const excludedIds = new Set(value);
-            //     const nonExcludedProducts = products.filter(product => !excludedIds.has(product.id));
-            //     updatedFormData.offer_products = nonExcludedProducts.map(product => product.id);
-            // } else if (field === "offer_products") {
-            //     // Ensure excluded products are not in offer_products
-            //     updatedFormData[field] = value.filter(id => !prevState.exclude_products.includes(id));
-            // }
-
-
-            return updatedFormData;
-        });
+        setFormData(prevState => ({
+            ...prevState,
+            [field]: value
+        }));
     };
-
 
     const handleClose = () => {
         setOpen(false);
@@ -259,7 +218,6 @@ const FbDefaultForm = () => {
                                 <TextField
                                     name="name"
                                     label="TITLE"
-
                                     variant="outlined"
                                     fullWidth
                                     value={formData.name}
@@ -290,38 +248,37 @@ const FbDefaultForm = () => {
                                 </FormControl>
                             </Grid>
 
-                            {formData.offer_type === 'BUY' ? (
+                            {formData.offer_type === 'BUY' && (
                                 <Grid item xs={12} sm={3}>
                                     <TextField
                                         name="get_option"
                                         label="BUY"
                                         variant="outlined"
                                         fullWidth
-                                        value={formData.get_option}
+                                        value={formData.get_option || ''}
                                         onChange={handleChange}
                                         type="number"
                                         inputProps={{ min: 0, step: 1 }}
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
-                            ) : null}
+                            )}
 
-                            {formData.offer_type === 'SPEND' ? (
+                            {formData.offer_type === 'SPEND' && (
                                 <Grid item xs={12} sm={3}>
                                     <TextField
                                         name="amount"
                                         label="Amount"
                                         variant="outlined"
                                         fullWidth
-                                        value={formData.amount}
+                                        value={formData.amount || ''}
                                         onChange={handleChange}
                                         type="number"
                                         inputProps={{ min: 0, step: 1 }}
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
-                            ) : null}
-
+                            )}
 
                             {formData.method !== "% OFF" && (
                                 <Grid item xs={12} sm={3}>
@@ -330,7 +287,7 @@ const FbDefaultForm = () => {
                                         label="Get"
                                         variant="outlined"
                                         fullWidth
-                                        value={formData.get_value}
+                                        value={formData.get_value || ''}
                                         onChange={handleChange}
                                         type="number"
                                         inputProps={{ min: 0, step: 1 }}
@@ -339,13 +296,13 @@ const FbDefaultForm = () => {
                                 </Grid>
                             )}
                             {formData.method === "% OFF" && (
-                                <Grid item xs={3}>
+                                <Grid item xs={12}>
                                     <TextField
                                         name="discount_percentage"
                                         label="Discount"
                                         variant="outlined"
                                         fullWidth
-                                        value={formData.discount_percentage}
+                                        value={formData.discount_percentage || ''}
                                         onChange={handleChange}
                                         type="number"
                                         inputProps={{ min: 0, step: 1 }}
@@ -371,140 +328,138 @@ const FbDefaultForm = () => {
                             </Grid>
 
 
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Typography variant="h5" component="h1">
-                                        ELIGIBLE PRODUCTS
-                                    </Typography>
-                                </Grid>
+                            <Grid item xs={12}>
+                                <Typography variant="h5" component="h1">
+                                    ELIGIBLE PRODUCTS
+                                </Typography>
+                            </Grid>
 
-                                {/* OFFER PRODUCTS */}
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                        <InputLabel id="offer-product-label">OFFER PRODUCT</InputLabel>
-                                        <Select
-                                            labelId="offer-product-label"
-                                            id="offer_products"
-                                            multiple
-                                            value={formData.offer_products}
-                                            onChange={(e) => handleMultipleChange(e, "offer_products")}
-                                            input={<OutlinedInput label="Offer Product" />}
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                        >
-                                            {products.map((product) => (
-                                                <MenuItem
-                                                    key={product.id}
-                                                    value={product.id}
-                                                    disabled={formData.exclude_products.includes(product.id)}
-                                                >
-                                                    {product.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
+                            {/* OFFER PRODUCTS */}
+                            <Grid item xs={12}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel id="offer-product-label">OFFER PRODUCT</InputLabel>
+                                    <Select
+                                        labelId="offer-product-label"
+                                        id="offer_products"
+                                        multiple
+                                        value={formData.offer_products}
+                                        onChange={(e) => handleMultipleChange(e, "offer_products")}
+                                        input={<OutlinedInput label="Offer Product" />}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    >
+                                        {products.map((product) => (
+                                            <MenuItem
+                                                key={product.id}
+                                                value={product.id}
+                                                disabled={formData.exclude_products.includes(product.id)}
+                                            >
+                                                {product.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                                {/* EXCLUDED OFFER PRODUCTS */}
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                        <InputLabel id="offer-excluded-products-label">EXCLUDED OFFER PRODUCTS</InputLabel>
-                                        <Select
-                                            labelId="offer-excluded-products-label"
-                                            id="exclude_products"
-                                            multiple
-                                            value={formData.exclude_products}
-                                            onChange={(e) => handleMultipleChange(e, "exclude_products")}
-                                            input={<OutlinedInput label="Excluded Offer Products" />}
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                        >
-                                            {products.map((product) => (
-                                                <MenuItem
-                                                    key={product.id}
-                                                    value={product.id}
-                                                    disabled={formData.offer_products.includes(product.id)}
-                                                >
-                                                    {product.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
+                            {/* EXCLUDED OFFER PRODUCTS */}
+                            <Grid item xs={12}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel id="offer-excluded-products-label">EXCLUDED OFFER PRODUCTS</InputLabel>
+                                    <Select
+                                        labelId="offer-excluded-products-label"
+                                        id="exclude_products"
+                                        multiple
+                                        value={formData.exclude_products}
+                                        onChange={(e) => handleMultipleChange(e, "exclude_products")}
+                                        input={<OutlinedInput label="Excluded Offer Products" />}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip key={value} label={products.find(p => p.id === value)?.name || value} />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    >
+                                        {products.map((product) => (
+                                            <MenuItem
+                                                key={product.id}
+                                                value={product.id}
+                                                disabled={formData.offer_products.includes(product.id)}
+                                            >
+                                                {product.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                                {/* OFFER CATEGORY */}
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                        <InputLabel id="offer-category-label">OFFER CATEGORY</InputLabel>
-                                        <Select
-                                            labelId="offer-category-label"
-                                            id="offer_category"
-                                            multiple
-                                            value={formData.offer_category}
-                                            onChange={(e) => handleMultipleChange(e, "offer_category")}
-                                            input={<OutlinedInput label="Offer Category" />}
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                        >
-                                            {categories.map((category) => (
-                                                <MenuItem
-                                                    key={category.id}
-                                                    value={category.id}
-                                                    disabled={formData.offer_products.length > 0 || formData.exclude_products.length > 0}
-                                                >
-                                                    {category.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
+                            {/* OFFER CATEGORY */}
+                            <Grid item xs={12}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel id="offer-category-label">OFFER CATEGORY</InputLabel>
+                                    <Select
+                                        labelId="offer-category-label"
+                                        id="offer_category"
+                                        multiple
+                                        value={formData.offer_category}
+                                        onChange={(e) => handleMultipleChange(e, "offer_category")}
+                                        input={<OutlinedInput label="Offer Category" />}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    >
+                                        {categories.map((category) => (
+                                            <MenuItem
+                                                key={category.id}
+                                                value={category.id}
+                                                disabled={formData.offer_products.length > 0 || formData.exclude_products.length > 0}
+                                            >
+                                                {category.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                                {/* EXCLUDED OFFER CATEGORY */}
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                                        <InputLabel id="excluded-offer-category-label">EXCLUDED OFFER CATEGORY</InputLabel>
-                                        <Select
-                                            labelId="excluded-offer-category-label"
-                                            id="excluded_offer_category"
-                                            multiple
-                                            value={formData.excluded_offer_category}
-                                            onChange={(e) => handleMultipleChange(e, "excluded_offer_category")}
-                                            input={<OutlinedInput label="Excluded Offer Category" />}
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                        >
-                                            {categories.map((category) => (
-                                                <MenuItem
-                                                    key={category.id}
-                                                    value={category.id}
-                                                    disabled={formData.offer_products.length > 0 || formData.exclude_products.length > 0}
-                                                >
-                                                    {category.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
+                            {/* EXCLUDED OFFER CATEGORY */}
+                            <Grid item xs={12}>
+                                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+                                    <InputLabel id="excluded-offer-category-label">EXCLUDED OFFER CATEGORY</InputLabel>
+                                    <Select
+                                        labelId="excluded-offer-category-label"
+                                        id="excluded_offer_category"
+                                        multiple
+                                        value={formData.excluded_offer_category}
+                                        onChange={(e) => handleMultipleChange(e, "excluded_offer_category")}
+                                        input={<OutlinedInput label="Excluded Offer Category" />}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip key={value} label={categories.find(c => c.id === value)?.name || value} />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    >
+                                        {categories.map((category) => (
+                                            <MenuItem
+                                                key={category.id}
+                                                value={category.id}
+                                                disabled={formData.offer_products.length > 0 || formData.exclude_products.length > 0}
+                                            >
+                                                {category.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Grid>
                             <Card>
                                 <CardContent>
@@ -517,7 +472,7 @@ const FbDefaultForm = () => {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                            <Typography variant="p" component="p">
+                                                <Typography variant="p" component="p">
                                                     Same as products is allowd
                                                 </Typography>
                                                 <FormControlLabel

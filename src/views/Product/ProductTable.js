@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { Card, CardContent, Box, Typography, TextField, Button } from "@mui/material";
+import { CardContent, Box, Typography, TextField, Button } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import ExTable from "./Table.js";
 
@@ -17,63 +17,30 @@ const ProductTable = () => {
   };
 
   return (
-    <Box position="relative">
-      <Card variant="outlined">
-        <CardContent>
-          <Typography variant="h3">Product Table</Typography>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              mb: 2,
-            }}
-          >
-            <TextField
-              label="Search"
-              placeholder="Search by username / date"
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-              startIcon={<SearchIcon />}
-            >
-              Submit
-            </Button>
-          </Box>
-          <Box
-            sx={{
-              overflowX: "auto",
-              overflowY: "hidden",
-              whiteSpace: "nowrap",
-              maxWidth: "100%",
-            }}
-          >
-            <ExTable searchQuery={submittedQuery} />
-          </Box>
-        </CardContent>
-      </Card>
-      <Button
-        component={RouterLink}
-        to="/product-form/"
-        variant="contained"
-        color="success"
+    <CardContent>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h3">Product Table</Typography>
+        <Button
+          component={RouterLink}
+          to="/product-form/"
+          variant="contained"
+          color="success"
+          sx={{ mt: { xs: 2, sm: 0 } }}
+        >
+          Add Product
+        </Button>
+      </Box>
+      <Box
         sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          mt: 2,
-          ml: 125,
+          overflow: {
+            xs: "auto",
+            sm: "unset",
+          },
         }}
       >
-        Add product
-      </Button>
-    </Box>
+        <ExTable />
+      </Box>
+    </CardContent>
   );
 };
 
