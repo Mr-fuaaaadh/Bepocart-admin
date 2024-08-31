@@ -40,7 +40,7 @@ const FbDefaultForm = () => {
         const fetchData = async () => {
             try {
                 // Fetch features
-                const featuresResponse = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${id}/`, {
+                const featuresResponse = await axios.get(`https://bepocart.in/admin/Bepocart-product-update/${id}/`, {
                     headers: {
                         'Authorization': `${token}`,
                     }
@@ -100,7 +100,7 @@ const FbDefaultForm = () => {
         formData.append("image5", state.image5);
 
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/admin/Bepocart-Product-image-add/${id}/`, formData, {
+            const response = await axios.post(`https://bepocart.in/admin/Bepocart-Product-image-add/${id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,

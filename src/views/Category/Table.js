@@ -43,7 +43,7 @@ const CategoryTable = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-categories/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-categories/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -75,7 +75,7 @@ const CategoryTable = () => {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-category-delete/${deleteProductId}/`, {
+            await axios.delete(`https://bepocart.in/admin/Bepocart-category-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -124,7 +124,7 @@ const CategoryTable = () => {
             }
 
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-category-update/${editProductId}/`, formData, {
+            await axios.put(`https://bepocart.in/admin/Bepocart-category-update/${editProductId}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                     'Content-Type': 'multipart/form-data',

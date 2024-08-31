@@ -46,7 +46,7 @@ const TableBanner = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Banners/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-Banners/", {
                 headers: { 'Authorization': `${token}` },
             });
             if (Array.isArray(response.data.data)) {
@@ -75,7 +75,7 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Banner-delete/${currentProduct.id}/`, {
+            await axios.delete(`https://bepocart.in/admin/Bepocart-Banner-delete/${currentProduct.id}/`, {
                 headers: { 'Authorization': `${token}` },
             });
             setProducts(products.filter(product => product.id !== currentProduct.id));
@@ -101,7 +101,7 @@ const TableBanner = () => {
                 formData.append("image", editedProductImage);
             }
 
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${currentProduct.id}/`, formData, {
+            await axios.put(`https://bepocart.in/admin/Bepocart-Banner-update/${currentProduct.id}/`, formData, {
                 headers: { 'Authorization': `${token}`, 'Content-Type': 'multipart/form-data' },
             });
 
@@ -128,6 +128,7 @@ const TableBanner = () => {
                         <TableRow>
                             <TableCell>Id</TableCell>
                             <TableCell>Name</TableCell>
+                            <TableCell>Category</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Delete</TableCell>
                             <TableCell>Update</TableCell>
@@ -147,6 +148,8 @@ const TableBanner = () => {
                                         style={{ maxWidth: "70px", maxHeight: "70px" }}
                                     />
                                 </TableCell>
+                                <Typography variant="h6">{product.category}</Typography>
+
                                 <TableCell>
                                     <Button variant="contained" color="error" onClick={() => handleDeleteConfirmation(product)}>
                                         <DeleteIcon /> Delete

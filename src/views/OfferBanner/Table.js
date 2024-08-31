@@ -42,7 +42,7 @@ const TableBanner = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Offer-Banners/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-Offer-Banners/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -72,7 +72,7 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Offer-Banner-Delete/${deleteProductId}/`, {
+            await axios.delete(`https://bepocart.in/admin/Bepocart-Offer-Banner-Delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -111,7 +111,7 @@ const TableBanner = () => {
                 formData.append("image", editedProductImage);
             }
 
-            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
+            const response = await axios.put(`https://bepocart.in/admin/Bepocart-Banner-update/${editProductId}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                     'Content-Type': 'multipart/form-data',

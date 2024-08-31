@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
-
-
 import {
     Typography,
     Box,
@@ -14,15 +11,15 @@ import {
     TableHead,
     TableRow,
     CircularProgress,
+    IconButton
 } from "@mui/material";
-// import PermMediaIcon from '@mui/icons-material/PermMedia';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const TableBanner = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
 
     useEffect(() => {
         fetchProducts();
@@ -33,7 +30,7 @@ const TableBanner = () => {
         setError(null); 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-customers/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-customers/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -57,6 +54,24 @@ const TableBanner = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this customer?")) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.delete(`https://bepocart.in/admin/Bepocart-customer-delete/${id}/`, {
+                    headers: {
+                        'Authorization': `${token}`,
+                    },
+                });
+                // Remove the deleted customer from the state
+                setProducts(products.filter(product => product.id !== id));
+            } catch (error) {
+                console.error("Error deleting customer:", error);
+                setError("Error deleting customer");
+            }
+        }
+    };
+
     return (
         <>
             {loading ? (
@@ -76,10 +91,11 @@ const TableBanner = () => {
                             <TableCell>Phone</TableCell>
                             <TableCell>Place</TableCell>
                             <TableCell>PinCode</TableCell>
+                            <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product,index) => (
+                        {products.map((product, index) => (
                             <TableRow key={product.id}>
                                 <TableCell>{index + 1}</TableCell>
                                 <TableCell>
@@ -128,6 +144,11 @@ const TableBanner = () => {
                                         </Typography>
                                     </Box>
                                 </TableCell>
+                                <TableCell>
+                                    <IconButton onClick={() => handleDelete(product.id)} color="error">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -136,6 +157,5 @@ const TableBanner = () => {
         </>
     );
 };
-
 
 export default TableBanner;

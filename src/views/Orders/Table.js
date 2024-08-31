@@ -58,7 +58,7 @@ const TableBanner = ({ searchQuery }) => {
         const fetchProducts = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Orders/", {
+                const response = await axios.get("https://bepocart.in/admin/Bepocart-Orders/", {
                     headers: {
                         'Authorization': `${token}`,
                     },
@@ -88,7 +88,7 @@ const TableBanner = ({ searchQuery }) => {
     const handleStatusChange = async (productId, newStatus) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Order-status-update/${productId}/`,
+            await axios.put(`https://bepocart.in/admin/Bepocart-Order-status-update/${productId}/`,
                 { status: newStatus },
                 {
                     headers: {

@@ -58,7 +58,7 @@ const FbDefaultForm = () => {
     const [coupons, setCoupons] = useState([]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
+        axios.get("https://bepocart.in/admin/Bepocart-products/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
@@ -67,7 +67,7 @@ const FbDefaultForm = () => {
             setDiscountProducts(response.data.data);
         });
 
-        axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
+        axios.get("https://bepocart.in/admin/Bepocart-subcategories/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
@@ -76,7 +76,7 @@ const FbDefaultForm = () => {
             setDiscountCategory(response.data.data);
         });
 
-        axios.get("http://127.0.0.1:8000/admin/Bepocart-promotion-coupen-views/", {
+        axios.get("https://bepocart.in/admin/Bepocart-promotion-coupen-views/", {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }
@@ -122,7 +122,7 @@ const FbDefaultForm = () => {
             get_value: formData.get_value === "" ? null : formData.get_value // Handle get_value as null
         };
 
-        axios.post("http://127.0.0.1:8000/admin/Bepocart-offer/", payload, {
+        axios.post("https://bepocart.in/admin/Bepocart-offer/", payload, {
             headers: {
                 Authorization: `${localStorage.getItem('token')}`
             }

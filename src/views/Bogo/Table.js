@@ -37,7 +37,7 @@ const BlogTable = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/offer/", {
+            const response = await axios.get("https://bepocart.in/admin/offer/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -67,7 +67,7 @@ const BlogTable = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-offer-delete/${deleteProductId}/`, {
+            await axios.delete(`https://bepocart.in/admin/Bepocart-offer-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -87,7 +87,7 @@ const BlogTable = () => {
     const handleStatusToggle = async (productId, currentStatus) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-offer/${productId}/toggle-status/`, {}, {
+            const response = await axios.put(`https://bepocart.in/admin/Bepocart-offer/${productId}/toggle-status/`, {}, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -124,7 +124,6 @@ const BlogTable = () => {
                         <TableRow>
                             <TableCell>ID</TableCell>
                             <TableCell>TITLE</TableCell>
-                            <TableCell>Image</TableCell>
                             <TableCell>OFFER TYPE</TableCell>
                             <TableCell>STATUS</TableCell>
                             <TableCell>ACTIONS</TableCell>
@@ -139,13 +138,7 @@ const BlogTable = () => {
                                         <Typography variant="h6">{product.name}</Typography>
                                     </Box>
                                 </TableCell>
-                                <TableCell>
-                                    <img
-                                        src={`${product.image}`}
-                                        alt={product.name}
-                                        style={{ maxWidth: "70px", maxHeight: "70px" }}
-                                    />
-                                </TableCell>
+                                
                                 <TableCell>
                                     <Box>
                                         <Typography variant="h6">{product.offer_type} {product.get_option} GET {product.get_value} {product.method}</Typography>

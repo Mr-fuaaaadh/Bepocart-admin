@@ -52,12 +52,12 @@ const FullScreenBox = styled(Box)({
 
 const Invoice = () => {
     const { order_id } = useParams();
-    const [orderData, setOrderData] = useState(null); // State to hold fetched order data
+    const [orderData, setOrderData] = useState(null);
 
     useEffect(() => {
         const fetchOrderData = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Bill/${order_id}/`);
+                const response = await axios.get(`https://bepocart.in/admin/Bepocart-Order-Bill/${order_id}/`);
                 setOrderData(response.data);
             } catch (error) {
                 console.error('Error fetching order data:', error);
@@ -98,19 +98,13 @@ const Invoice = () => {
             return;
         }
 
-        // Load all images first
-        const images = Array.from(input.getElementsByTagName('img'));
-        const loadImagesPromises = images.map(img => loadImage(img.src));
-
         try {
-            await Promise.all(loadImagesPromises);
-        } catch (error) {
-            console.error('Error loading images:', error);
-            return;
-        }
+            // Ensure all images are loaded
+            const images = Array.from(input.getElementsByTagName('img'));
+            await Promise.all(images.map(img => loadImage(img.src)));
 
-        // Create canvas and PDF after images are loaded
-        html2canvas(input).then((canvas) => {
+            // Generate the PDF
+            const canvas = await html2canvas(input);
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
@@ -129,10 +123,15 @@ const Invoice = () => {
                 heightLeft -= pageHeight;
             }
 
-            pdf.save('invoice.pdf');
-        }).catch(error => {
-            console.error('Error converting to PDF:', error);
-        });
+            pdf.save(`${orderData.data.order_id}_invoice.pdf`);
+        } catch (error) {
+            console.error('Error creating PDF:', error.message || error);
+        }
+    };
+
+    // Function to handle printing the invoice
+    const printInvoice = () => {
+        window.print();
     };
 
     return (
@@ -200,14 +199,14 @@ const Invoice = () => {
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>
-                                            <img src={`${item.productImage}`} alt={item.productName} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                        </TableCell>
+                                                <img src={`${item.productImage}`} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                            </TableCell>
                                             <TableCell>{item.productName}</TableCell>
                                             <TableCell>{item.quantity}</TableCell>
-                                            <TableCell>${item.salePrice}</TableCell>
+                                            <TableCell>₹{item.price}</TableCell>
                                             <TableCell>
                                                 <Typography color="error" style={{ fontWeight: 'bold' }}>
-                                                    ${(item.quantity * parseFloat(item.salePrice)).toFixed(2)}
+                                                    ₹{(item.quantity * parseFloat(item.price)).toFixed(2)}
                                                 </Typography>
                                             </TableCell>
                                         </TableRow>
@@ -222,19 +221,15 @@ const Invoice = () => {
                             </Box>
                             <Box>
                                 <Typography variant="h6">COD CHARGE</Typography>
-                                <Typography variant="body2">${codCharge.toFixed(2)}</Typography>
+                                <Typography variant="body2">₹{codCharge.toFixed(2)}</Typography>
                             </Box>
                             <Box>
                                 <Typography variant="body2">SHIPPING COST</Typography>
-                                <Typography variant="body2">${shippingCharge.toFixed(2)}</Typography>
+                                <Typography variant="body2">₹{shippingCharge.toFixed(2)}</Typography>
                             </Box>
-                            {/* <Box>
-                                <Typography variant="body2">DISCOUNT</Typography>
-                                <Typography variant="body2">$0.00</Typography>
-                            </Box> */}
                             <Box>
                                 <Typography variant="h6">TOTAL AMOUNT</Typography>
-                                <Typography variant="h6" color="error" style={{ fontWeight: 'bold' }}>${totalAmount.toFixed(2)}</Typography>
+                                <Typography variant="h6" color="error" style={{ fontWeight: 'bold' }}>₹{totalAmount.toFixed(2)}</Typography>
                             </Box>
                         </InvoiceFooter>
                     </CardContent>
@@ -244,7 +239,7 @@ const Invoice = () => {
                 <Button variant="contained" color="primary" onClick={downloadInvoice}>
                     Download Invoice
                 </Button>
-                <Button variant="contained" color="secondary">
+                <Button variant="contained" color="secondary" onClick={printInvoice}>
                     Print Invoice
                 </Button>
             </Box>

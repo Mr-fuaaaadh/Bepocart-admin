@@ -44,7 +44,7 @@ const FbDefaultForm = () => {
         const fetchCategories = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
+                const response = await axios.get("https://bepocart.in/admin/Bepocart-subcategories/", {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -106,8 +106,8 @@ const FbDefaultForm = () => {
                     discount,
                 };
             }
-            if (name === "shortDescription" && value.length > 255) {
-                setMessage("Short description cannot exceed 255 characters.");
+            if (name === "shortDescription" && value.length > 5000) {
+                setMessage("Short description cannot exceed 5000 characters.");
                 setSeverity("error");
                 setOpen(true);
                 return;
@@ -142,7 +142,7 @@ const FbDefaultForm = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-product/", formData, {
+            const response = await axios.post("https://bepocart.in/admin/Bepocart-product/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `${token}`,

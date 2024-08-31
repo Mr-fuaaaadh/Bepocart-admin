@@ -28,7 +28,7 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`, {
+            const response = await axios.get(`https://bepocart.in/admin/Bepocart-Order-Item/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -102,7 +102,6 @@ const TableBanner = () => {
                                 <Box display="flex" alignItems="center">
                                     <img
                                         src={`${product.productImage}`}
-                                        alt={product.productName}
                                         style={{ maxWidth: "50px", maxHeight: "50px", marginRight: "10px" }}
                                     />
                                     <Typography
@@ -116,7 +115,11 @@ const TableBanner = () => {
                                         }}
                                     >
                                         {truncateText(product.productName, 20)}
-                                        <span style={{ marginTop: '4px', fontSize: '0.875rem', color: 'green' }}>{product.offer_type}</span>
+                                        {product.offer_type !== "none" && (
+                                            <span style={{ marginTop: '4px', fontSize: '0.875rem', color: 'green' }}>
+                                                {product.offer_type}
+                                            </span>
+                                        )}
                                     </Typography>
                                 </Box>
                             </TableCell>
@@ -134,18 +137,19 @@ const TableBanner = () => {
                 </TableBody>
             </Table>
 
-            <Box
-                mt={2}
-                p={2}
-                border="1px dotted green"
-                borderRadius="4px"
-                bgcolor="#e8f5e9"
-                display="flex"
-                justifyContent="flex-start"
-            >
-                <Typography variant="subtitle1">Total Free Quantity : {order.free_quantity}</Typography>
-            </Box>
-
+            {products.some(product => product.offer_type !== "none") && (
+                <Box
+                    mt={2}
+                    p={2}
+                    border="1px dotted green"
+                    borderRadius="4px"
+                    bgcolor="#e8f5e9"
+                    display="flex"
+                    justifyContent="flex-start"
+                >
+                    <Typography variant="subtitle1">Total Free Quantity : {order.free_quantity}</Typography>
+                </Box>
+            )}
 
             <Box mt={7} display="flex" justifyContent="flex-end">
                 <Box mr={4}>
@@ -158,7 +162,7 @@ const TableBanner = () => {
                 <Box>
                     <Typography variant="subtitle1">₹{TotalPrice()} /-</Typography>
                     <Typography variant="subtitle1">₹{TotalPrice() - ProductOriginalPrice()} /-</Typography>
-                    <Typography variant="subtitle1">${shippingCharge.toFixed(2)}/-</Typography>
+                    <Typography variant="subtitle1">₹{shippingCharge.toFixed(2)}/-</Typography>
                     <Typography variant="subtitle1" fontWeight="bold">₹{order.total_amount} /-</Typography>
                     <Typography variant="subtitle1" color="secondary">{order.status}</Typography>
                 </Box>

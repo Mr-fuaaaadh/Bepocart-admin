@@ -5,16 +5,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import ExTable from "./Table.js";
 
 const ProductTable = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [submittedQuery, setSubmittedQuery] = useState("");
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSubmit = () => {
-    setSubmittedQuery(searchQuery);
-  };
 
   return (
     <CardContent>

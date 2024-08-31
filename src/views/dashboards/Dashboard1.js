@@ -26,7 +26,7 @@ const Dashboard1 = () => {
           <ProductPerformance />
         </Grid>
         {/* ------------------------- row 3 ------------------------- */}
-        <BlogCard />
+        {/* <BlogCard /> */}
       </Grid>
     </Box>
   );

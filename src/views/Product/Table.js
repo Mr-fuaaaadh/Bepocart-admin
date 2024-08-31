@@ -36,7 +36,7 @@ const TableBanner = () => {
     const fetchProducts = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-products/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-products/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -93,7 +93,7 @@ const TableBanner = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-product-delete/${deleteProductId}/`, {
+            await axios.delete(`https://bepocart.in/admin/Bepocart-product-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },

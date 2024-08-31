@@ -44,7 +44,7 @@ const FbDefaultForm = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Blog/", formData, {
+            const response = await axios.post("https://bepocart.in/admin/Bepocart-Blog/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `${token}`,

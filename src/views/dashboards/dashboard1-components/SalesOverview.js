@@ -1,8 +1,42 @@
 import React from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import Chart from 'react-apexcharts';
+import { styled } from '@mui/material/styles';
+import { 
+  ShoppingCart as ShoppingCartIcon,
+  HourglassEmpty as HourglassEmptyIcon,
+  CheckCircle as CheckCircleIcon,
+  Today as TodayIcon,
+  CalendarToday as CalendarTodayIcon
+} from '@mui/icons-material';
 
+// Styled component for the logo
+const Logo = styled('img')({
+  maxWidth: '150px',
+  height: 'auto',
+  display: 'block',
+  margin: '0 auto',
+});
 
+const MetricBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[1],
+  textAlign: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  marginBottom: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    marginBottom: theme.spacing(1),
+  },
+}));
+
+const MetricIcon = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(1),
+  fontSize: '2rem',
+}));
 
 const SalesOverview = () => {
   const optionssalesoverview = {
@@ -24,7 +58,6 @@ const SalesOverview = () => {
         borderRadius: 5,
       },
     },
-
     colors: ["#1e4db7", "#a7e3f4"],
     fill: {
       type: "solid",
@@ -93,6 +126,7 @@ const SalesOverview = () => {
       theme: "dark",
     },
   };
+
   const seriessalesoverview = [
     {
       name: "Ample Admin",
@@ -103,10 +137,6 @@ const SalesOverview = () => {
       data: [280, 250, 325, 215, 250, 310, 280, 250, 325, 215, 250, 310],
     },
   ];
-
-
-
-
 
   return (
     <Card
@@ -122,84 +152,67 @@ const SalesOverview = () => {
       >
         <Box
           sx={{
-            display: {
-              sm: "flex",
-              xs: "block",
-            },
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            marginBottom: '20px',
           }}
         >
-          <Box>
-            <Typography
-              variant="h3"
-              sx={{
-                marginBottom: "0",
-              }}
-              gutterBottom
-            >
-              Sales Overview
-            </Typography>
-          </Box>
-          <Box
+          <Typography
+            variant="h3"
             sx={{
-              marginLeft: "auto",
-              display: "flex",
-              mt: {
-                lg: 0,
-                xs: 2,
-              },
+              marginTop: "10px",
+              marginBottom: "0",
             }}
+            gutterBottom
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: "secondary.main",
-                  borderRadius: "50%",
-                  height: 8,
-                  width: 8,
-                  mr: 1,
-                }}
-              />
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "secondary.main",
-                }}
-              >
-                Ample
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                marginLeft: "10px",
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: "primary.main",
-                  borderRadius: "50%",
-                  height: 8,
-                  width: 8,
-                  mr: 1,
-                }}
-              />
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "primary.main",
-                }}
-              >
-                Pixel Admin
-              </Typography>
-            </Box>
-          </Box>
+            Sales Overview
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            gap: 2,
+            marginBottom: '25px',
+          }}
+        >
+          <MetricBox sx={{ backgroundColor: '#e3f2fd' }}>
+            <MetricIcon>
+              <ShoppingCartIcon sx={{ color: '#1e4db7' }} />
+            </MetricIcon>
+            <Typography variant="h5" sx={{ color: '#1e4db7' }}>Total Orders</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>1,245</Typography>
+          </MetricBox>
+          <MetricBox sx={{ backgroundColor: '#fce4ec' }}>
+            <MetricIcon>
+              <HourglassEmptyIcon sx={{ color: '#ff5722' }} />
+            </MetricIcon>
+            <Typography variant="h5" sx={{ color: '#ff5722' }}>Pending Orders</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>312</Typography>
+          </MetricBox>
+          <MetricBox sx={{ backgroundColor: '#e8f5e9' }}>
+            <MetricIcon>
+              <CheckCircleIcon sx={{ color: '#4caf50' }} />
+            </MetricIcon>
+            <Typography variant="h5" sx={{ color: '#4caf50' }}>Completed Orders</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>900</Typography>
+          </MetricBox>
+          <MetricBox sx={{ backgroundColor: '#e1bee7' }}>
+            <MetricIcon>
+              <TodayIcon sx={{ color: '#ab47bc' }} />
+            </MetricIcon>
+            <Typography variant="h5" sx={{ color: '#ab47bc' }}>Today's Orders</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>50</Typography>
+          </MetricBox>
+          <MetricBox sx={{ backgroundColor: '#d0f0c0' }}>
+            <MetricIcon>
+              <CalendarTodayIcon sx={{ color: '#66bb6a' }} />
+            </MetricIcon>
+            <Typography variant="h5" sx={{ color: '#66bb6a' }}>Monthly Orders</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>300</Typography>
+          </MetricBox>
         </Box>
         <Box
           sx={{
