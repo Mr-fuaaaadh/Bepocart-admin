@@ -125,6 +125,8 @@ const TableBanner = ({ searchQuery }) => {
                         <TableRow>
                             <TableCell>Id</TableCell>
                             <TableCell>ORDER ID</TableCell>
+                            <TableCell>TIME</TableCell>
+
                             <TableCell>CUSTOMER NAME</TableCell>
                             <TableCell>Customer Image</TableCell>
                             <TableCell>Address</TableCell>
@@ -133,6 +135,7 @@ const TableBanner = ({ searchQuery }) => {
                             <TableCell>Coupon</TableCell>
                             <TableCell>Payment Method</TableCell>
                             <TableCell>Payment ID</TableCell>
+                            <TableCell>Order ID</TableCell>
                             <TableCell>Orders</TableCell>
                         </TableRow>
                     </TableHead>
@@ -154,11 +157,22 @@ const TableBanner = ({ searchQuery }) => {
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <Typography variant="body1" noWrap>
-                                                {highlightText(product.customerName, searchQuery)}
+                                                {product.created_time}
                                             </Typography>
                                         </Link>
                                     </Box>
                                 </TableCell>
+
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Typography variant="body1" noWrap>
+                                                {highlightText(product.created_time, searchQuery)}
+                                            </Typography>
+                                        </Link>
+                                    </Box>
+                                </TableCell>
+
                                 <TableCell>
                                     <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <img
@@ -236,6 +250,14 @@ const TableBanner = ({ searchQuery }) => {
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Typography variant="body1" noWrap>
                                             {product.payment_id ? product.payment_id : "N/A"}
+                                        </Typography>
+                                    </Box>
+                                </TableCell>
+
+                                <TableCell>
+                                    <Box sx={{ maxWidth: "150px" }}>
+                                        <Typography variant="body1" noWrap>
+                                            {product.razorpay_order_id ? product.razorpay_order_id : "N/A"}
                                         </Typography>
                                     </Box>
                                 </TableCell>
