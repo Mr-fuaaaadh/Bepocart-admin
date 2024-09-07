@@ -50,6 +50,7 @@ const FullScreenBox = styled(Box)({
     boxSizing: 'border-box',
 });
 
+
 const Invoice = () => {
     const { order_id } = useParams();
     const [orderData, setOrderData] = useState(null);
@@ -84,12 +85,13 @@ const Invoice = () => {
     const loadImage = (src) => {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            img.crossOrigin = 'anonymous';
+            img.crossOrigin = 'anonymous'; // Ensure this matches your CORS policy
             img.onload = () => resolve(img);
             img.onerror = (err) => reject(err);
             img.src = src;
         });
     };
+    
 
     const downloadInvoice = async () => {
         const input = document.getElementById('invoice-container');
@@ -97,49 +99,124 @@ const Invoice = () => {
             console.error('Invoice container not found');
             return;
         }
-
+    
         try {
             // Ensure all images are loaded
             const images = Array.from(input.getElementsByTagName('img'));
             await Promise.all(images.map(img => loadImage(img.src)));
-
+    
             // Generate the PDF
             const canvas = await html2canvas(input);
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 210;
-            const pageHeight = 295;
+            const imgWidth = 210; // Width in mm
+            const pageHeight = 295; // Height in mm
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             let heightLeft = imgHeight;
             let position = 0;
-
+    
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
-
+    
             while (heightLeft >= 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
             }
-
+    
             pdf.save(`${orderData.data.order_id}_invoice.pdf`);
         } catch (error) {
             console.error('Error creating PDF:', error.message || error);
         }
     };
+    
 
-    // Function to handle printing the invoice
     const printInvoice = () => {
-        window.print();
+        const printContent = document.getElementById('invoice-container').innerHTML;
+    
+        const printWindow = window.open('', '', 'height=800,width=800');
+        printWindow.document.write('<html><head><title>Invoice</title>');
+        printWindow.document.write(`
+            <style>
+                @media print {
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }
+                    #invoice-container {
+                        width: 100%;
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    .invoice-header, .invoice-footer {
+                        margin: 0;
+                        padding: 10px;
+                        border-bottom: 1px solid #ddd;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .invoice-header {
+                        border-bottom: 2px solid #000;
+                    }
+                    .invoice-footer {
+                        border-top: 2px solid #000;
+                        text-align: right;
+                    }
+                    .invoice-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        text-align: left;
+                    }
+                    .invoice-table th, .invoice-table td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    .invoice-table th {
+                        background-color: #f4f4f4;
+                    }
+                    img {
+                        max-width: 100px;
+                        height: auto;
+                        object-fit: cover;
+                    }
+                    .page-break {
+                        page-break-before: always;
+                    }
+                    button {
+                        display: none;
+                    }
+                }
+            </style>
+        `);
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(printContent);
+        printWindow.document.write('</body></html>');
+    
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.onload = function () {
+            printWindow.print();
+            printWindow.close();
+        };
     };
+    
+    
+    
+    
 
     return (
         <FullScreenBox>
             <div id="invoice-container">
                 <Card variant="outlined" style={{ height: '100%' }}>
                     <CardContent style={{ height: '100%' }}>
-                        <InvoiceHeader>
+                        <InvoiceHeader className='invoice-header'>
                             <Box>
                                 <Typography variant="h4">INVOICE</Typography>
                                 <Typography variant="body2" color="primary">{orderData.data.status}</Typography>

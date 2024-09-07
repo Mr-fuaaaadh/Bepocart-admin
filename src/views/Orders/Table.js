@@ -107,9 +107,10 @@ const TableBanner = ({ searchQuery }) => {
     };
 
     const filteredProducts = products.filter(product =>
-        product.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.created_at.toLowerCase().includes(searchQuery.toLowerCase())
+        (product.customerName && product.customerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (product.created_at && product.created_at.toLowerCase().includes(searchQuery.toLowerCase()))
     );
+    
 
     return (
         <>
@@ -167,7 +168,7 @@ const TableBanner = ({ searchQuery }) => {
                                     <Box sx={{ maxWidth: "150px" }}>
                                         <Link to={`/product-image-form/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <Typography variant="body1" noWrap>
-                                                {highlightText(product.created_time, searchQuery)}
+                                                {highlightText(product.customerName, searchQuery)}
                                             </Typography>
                                         </Link>
                                     </Box>
