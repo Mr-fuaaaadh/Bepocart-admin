@@ -48,7 +48,7 @@ const TableBanner = () => {
         setError(null); 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-customers/", {
+            const response = await axios.get("https://bepocart.in/admin/Bepocart-customers/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -75,7 +75,7 @@ const TableBanner = () => {
         if (window.confirm("Are you sure you want to delete this customer?")) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-customer-delete/${id}/`, {
+                await axios.delete(`https://bepocart.in/admin/Bepocart-customer-delete/${id}/`, {
                     headers: {
                         'Authorization': `${token}`,
                     },
@@ -124,7 +124,7 @@ const TableBanner = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-customer-update/${selectedCustomer.id}/`, formData, {
+            await axios.put(`https://bepocart.in/admin/Bepocart-customer-update/${selectedCustomer.id}/`, formData, {
                 headers: {
                     'Authorization': `${token}`,
                     'Content-Type': 'multipart/form-data'
