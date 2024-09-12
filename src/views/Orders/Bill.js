@@ -91,7 +91,7 @@ const Invoice = () => {
             img.src = src;
         });
     };
-    
+
 
     const downloadInvoice = async () => {
         const input = document.getElementById('invoice-container');
@@ -99,12 +99,12 @@ const Invoice = () => {
             console.error('Invoice container not found');
             return;
         }
-    
+
         try {
             // Ensure all images are loaded
             const images = Array.from(input.getElementsByTagName('img'));
             await Promise.all(images.map(img => loadImage(img.src)));
-    
+
             // Generate the PDF
             const canvas = await html2canvas(input);
             const imgData = canvas.toDataURL('image/png');
@@ -114,27 +114,27 @@ const Invoice = () => {
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             let heightLeft = imgHeight;
             let position = 0;
-    
+
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
-    
+
             while (heightLeft >= 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
             }
-    
+
             pdf.save(`${orderData.data.order_id}_invoice.pdf`);
         } catch (error) {
             console.error('Error creating PDF:', error.message || error);
         }
     };
-    
+
 
     const printInvoice = () => {
         const printContent = document.getElementById('invoice-container').innerHTML;
-    
+
         const printWindow = window.open('', '', 'height=800,width=800');
         printWindow.document.write('<html><head><title>Invoice</title>');
         printWindow.document.write(`
@@ -198,7 +198,7 @@ const Invoice = () => {
         printWindow.document.write('</head><body>');
         printWindow.document.write(printContent);
         printWindow.document.write('</body></html>');
-    
+
         printWindow.document.close();
         printWindow.focus();
         printWindow.onload = function () {
@@ -206,10 +206,10 @@ const Invoice = () => {
             printWindow.close();
         };
     };
-    
-    
-    
-    
+
+
+
+
 
     return (
         <FullScreenBox>
@@ -272,23 +272,28 @@ const Invoice = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {orderData.order_items.map((item, index) => (
+                                    {orderData.order_items.map(({ productImage, productName, color, size, quantity, price }, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>
-                                                <img src={`${item.productImage}`} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                <img
+                                                    src={productImage}
+                                                    alt={`${productName} - ${color} - ${size}`}
+                                                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                />
                                             </TableCell>
-                                            <TableCell>{item.productName}</TableCell>
-                                            <TableCell>{item.quantity}</TableCell>
-                                            <TableCell>₹{item.price}</TableCell>
+                                            <TableCell>{productName} - {color} - {size}</TableCell>
+                                            <TableCell>{quantity}</TableCell>
+                                            <TableCell>₹{price}</TableCell>
                                             <TableCell>
                                                 <Typography color="error" style={{ fontWeight: 'bold' }}>
-                                                    ₹{(item.quantity * parseFloat(item.price)).toFixed(2)}
+                                                    ₹{(quantity * parseFloat(price)).toFixed(2)}
                                                 </Typography>
                                             </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
+
                             </Table>
                         </InvoiceTable>
                         <InvoiceFooter>
