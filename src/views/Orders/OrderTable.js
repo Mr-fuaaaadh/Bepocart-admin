@@ -40,7 +40,7 @@ const ProductTable = () => {
     console.log('Request Body:', requestBody);
 
     // Send data to the backend API and handle the Excel file download
-    axios.post('https://bepocart.in/admin/export-orders/', requestBody, {
+    axios.post('http://127.0.0.1:8000/admin/export-orders/', requestBody, {
       responseType: 'blob' // This ensures the response is treated as binary data
     })
     .then(response => {

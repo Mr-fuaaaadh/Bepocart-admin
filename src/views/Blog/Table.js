@@ -36,7 +36,7 @@ const BlogTable = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("https://bepocart.in/admin/Bepocart-Blogs/", {
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Blogs/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -66,7 +66,7 @@ const BlogTable = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`https://bepocart.in/admin/Bepocart-Blog-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Blog-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },

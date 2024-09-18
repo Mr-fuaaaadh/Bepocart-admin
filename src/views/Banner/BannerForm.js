@@ -36,7 +36,7 @@ const FbDefaultForm = () => {
         const fetchSubcategories = async () => {
             try {
                 const token = localStorage.getItem('token'); // Retrieve the token from local storage
-                const response = await axios.get("https://bepocart.in/admin/Bepocart-subcategories/", {
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-subcategories/", {
                     headers: {
                         'Authorization': `${token}`,
                     }
@@ -80,7 +80,7 @@ const FbDefaultForm = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post("https://bepocart.in/admin/Bepocart-Banner/", formData, {
+            const response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Banner/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `${token}`,

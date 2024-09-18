@@ -29,7 +29,7 @@ const TableBanner = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("https://bepocart.in/admin/Bepocart-Product-Review/", {
+            const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Product-Review/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -56,7 +56,7 @@ const TableBanner = () => {
     const handleApprove = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`https://bepocart.in/admin/Bepocart-approve-review/${id}/`, null, {
+            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-approve-review/${id}/`, null, {
                 headers: {
                     'Authorization': `${token}`,
                 },

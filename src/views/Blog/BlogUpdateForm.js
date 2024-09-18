@@ -38,7 +38,7 @@ const FbDefaultForm = () => {
     const fetchBlogData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`https://bepocart.in/admin/Bepocart-Blog-update/${id}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Blog-update/${id}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -78,14 +78,14 @@ const FbDefaultForm = () => {
             const token = localStorage.getItem('token');
             let response;
             if (updateMode) {
-                response = await axios.put(`https://bepocart.in/admin/Bepocart-Blog-update/${id}/`, formData, {
+                response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Blog-update/${id}/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `${token}`,
                     },
                 });
             } else {
-                response = await axios.post("https://bepocart.in/admin/Bepocart-Blog-create/", formData, {
+                response = await axios.post("http://127.0.0.1:8000/admin/Bepocart-Blog-create/", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `${token}`,

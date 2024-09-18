@@ -28,7 +28,7 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`https://bepocart.in/admin/Bepocart-Order-Item/${productId}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Order-Item/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },

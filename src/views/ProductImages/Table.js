@@ -44,7 +44,7 @@ const TableBanner = () => {
     useEffect(() => {
         const fetchData = async (productId) => {
             try {
-                const featuresResponse = await axios.get(`https://bepocart.in/admin/Bepocart-product-update/${productId}/`, {
+                const featuresResponse = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-product-update/${productId}/`, {
                     headers: {
                         'Authorization': `${token}`,
                     }
@@ -60,7 +60,7 @@ const TableBanner = () => {
     const fetchProducts = async (productId) => {
         setLoading(true);
         try {
-            const response = await axios.get(`https://bepocart.in/admin/Bepocart-Product-images/${productId}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/admin/Bepocart-Product-images/${productId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -91,7 +91,7 @@ const TableBanner = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://bepocart.in/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-Product-images-delete/${deleteProductId}/`, {
             data: {
                     productType: productType
                 },

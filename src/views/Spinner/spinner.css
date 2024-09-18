@@ -1,78 +1,53 @@
 .fallback-spinner {
-  position: relative;
   display: flex;
-  height: 100vh;
-  width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+  background-color: #f3f4f6; /* Background color, optional */
 }
+
 .loading {
-  position: absolute;
-  left: calc(50% - 35px);
-  top: 50%;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  border: 3px solid transparent;
+  position: relative;
+  width: 80px;
+  height: 80px;
 }
-.effect-1,
-.effect-2 {
+
+.effects {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 3px solid transparent;
-  border-left: 3px solid #2962ff;
   border-radius: 50%;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  border: 4px solid transparent;
+  animation: spin 1.2s linear infinite;
 }
 
 .effect-1 {
-  animation: rotate 1s ease infinite;
-}
-.effect-2 {
-  animation: rotateOpacity 1s ease infinite 0.1s;
-}
-.effect-3 {
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  border: 3px solid transparent;
-  border-left: 3px solid #2962ff;
-  -webkit-animation: rotateOpacity 1s ease infinite 0.2s;
-  animation: rotateOpacity 1s ease infinite 0.2s;
-  border-radius: 50%;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  border-top-color: #3498db;
 }
 
-.loading .effects {
-  transition: all 0.3s ease;
-}
-.fallback-logo {
-  position: absolute;
-  left: calc(50% - 45px);
-  top: 40%;
+.effect-2 {
+  top: 8px;
+  left: 8px;
+  width: 64px;
+  height: 64px;
+  border-bottom-color: #e74c3c;
 }
 
-@keyframes rotate {
+.effect-3 {
+  top: 16px;
+  left: 16px;
+  width: 48px;
+  height: 48px;
+  border-right-color: #f9c922;
+}
+
+@keyframes spin {
   0% {
-    -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
   100% {
-    -webkit-transform: rotate(1turn);
-    transform: rotate(1turn);
-  }
-}
-@keyframes rotateOpacity {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-    opacity: 0.1;
-  }
-  100% {
-    -webkit-transform: rotate(1turn);
-    transform: rotate(1turn);
-    opacity: 1;
+    transform: rotate(360deg);
   }
 }

@@ -37,7 +37,7 @@ const BlogTable = () => {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get("https://bepocart.in/admin/offer/", {
+            const response = await axios.get("http://127.0.0.1:8000/admin/offer/", {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -67,7 +67,7 @@ const BlogTable = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`https://bepocart.in/admin/Bepocart-offer-delete/${deleteProductId}/`, {
+            await axios.delete(`http://127.0.0.1:8000/admin/Bepocart-offer-delete/${deleteProductId}/`, {
                 headers: {
                     'Authorization': `${token}`,
                 },
@@ -87,7 +87,7 @@ const BlogTable = () => {
     const handleStatusToggle = async (productId, currentStatus) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`https://bepocart.in/admin/Bepocart-offer/${productId}/toggle-status/`, {}, {
+            const response = await axios.put(`http://127.0.0.1:8000/admin/Bepocart-offer/${productId}/toggle-status/`, {}, {
                 headers: {
                     'Authorization': `${token}`,
                 },

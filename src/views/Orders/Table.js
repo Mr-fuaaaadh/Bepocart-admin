@@ -39,7 +39,7 @@ const getStatusColor = (status) => {
 
 const highlightText = (text, query) => {
     if (!query) return text;
-    const parts = text.split(new RegExp(`(${query})`, 'gi'));   
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return parts.map((part, index) =>
         part.toLowerCase() === query.toLowerCase() ? (
             <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span>
@@ -61,7 +61,7 @@ const TableBanner = ({ searchQuery }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get("https://bepocart.in/admin/Bepocart-Orders/", {
+                const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Orders/", {
                     headers: {
                         'Authorization': `${token}`,
                     },
@@ -89,7 +89,7 @@ const TableBanner = ({ searchQuery }) => {
 
     const handleStatusChange = async (productId, newStatus) => {
         try {
-            await axios.put(`https://bepocart.in/admin/Bepocart-Order-status-update/${productId}/`,
+            await axios.put(`http://127.0.0.1:8000/admin/Bepocart-Order-status-update/${productId}/`,
                 { status: newStatus },
                 {
                     headers: {
@@ -165,32 +165,32 @@ const TableBanner = ({ searchQuery }) => {
 
                                     <TableCell>
                                         <Box sx={{ maxWidth: "150px" }}>
-                                            
-                                                <Typography variant="body1" noWrap>
-                                                    {product.created_time}
-                                                </Typography>
-                                       
+
+                                            <Typography variant="body1" noWrap>
+                                                {product.created_time}
+                                            </Typography>
+
                                         </Box>
                                     </TableCell>
 
                                     <TableCell>
                                         <Box sx={{ maxWidth: "150px" }}>
-                                            
-                                                <Typography variant="body1" noWrap>
-                                                    {highlightText(product.customerName, searchQuery)}
-                                                </Typography>
-                                        
+
+                                            <Typography variant="body1" noWrap>
+                                                {highlightText(product.customerName, searchQuery)}
+                                            </Typography>
+
                                         </Box>
                                     </TableCell>
 
                                     <TableCell>
-                                        
-                                            <img
-                                                src={`${product.customerImage}`}
-                                                alt={product.customerName}
-                                                style={{ maxWidth: "50px", maxHeight: "50px" }}
-                                            />
-                                       
+
+                                        <img
+                                            src={`${product.customerImage}`}
+                                            alt={product.customerName}
+                                            style={{ maxWidth: "50px", maxHeight: "50px" }}
+                                        />
+
                                     </TableCell>
                                     <TableCell>
                                         <Box sx={{ maxWidth: "250px" }}>
@@ -278,7 +278,7 @@ const TableBanner = ({ searchQuery }) => {
                                             color="primary"
                                             startIcon={<PermMediaIcon />}
                                             sx={{ mt: 1 }}
-                                            onClick={() => navigate(`/product-image-form/${product.id}/`)}
+                                            onClick={() => navigate(`/order-product-table/${product.id}/`)}
                                         >
                                             View
                                         </Button>

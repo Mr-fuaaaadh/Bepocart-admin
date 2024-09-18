@@ -54,7 +54,7 @@ const SalesOverview = () => {
   // Function to fetch orders from the API
   const fetchOrderData = async () => {
     try {
-      const response = await axios.get("https://bepocart.in/admin/Bepocart-Orders/",{
+      const response = await axios.get("http://127.0.0.1:8000/admin/Bepocart-Orders/",{
         headers: {
           'Authorization': `${token}`,
       },

@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 
 // Replace with your actual API endpoint
-const API_URL = "https://bepocart.in/admin/Bepocart-saled-products/";
+const API_URL = "http://127.0.0.1:8000/admin/Bepocart-saled-products/";
 
 const ExTable = () => {
   const [products, setProducts] = useState([]);
